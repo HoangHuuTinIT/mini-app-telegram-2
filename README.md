@@ -7,7 +7,7 @@ and libraries:
 - [Vue](https://vuejs.org/)
 - [TypeScript](https://www.typescriptlang.org/)
 - [TON Connect](https://docs.ton.org/develop/dapps/ton-connect/overview)
-- [@telegram-apps SDK](https://docs.telegram-mini-apps.com/packages/telegram-apps-sdk/2-x)
+- [@tma.js SDK](https://docs.telegram-mini-apps.com/packages/tma-js-sdk)
 - [Vite](https://vitejs.dev/)
 
 > The template was created using [npm](https://www.npmjs.com/). Therefore, it is
@@ -90,7 +90,7 @@ browser:
 ![Application](assets/application.png)
 
 It is important to note that some libraries in this template, such as
-`@telegram-apps/sdk`, are not intended for use outside of Telegram.
+`@tma.js/sdk`, are not intended for use outside of Telegram.
 
 Nevertheless, they appear to function properly. This is because the
 `src/mockEnv.ts` file, which is imported in the application's entry point (
@@ -210,5 +210,5 @@ file according to your project's information.
 ## Useful Links
 
 - [Platform documentation](https://docs.telegram-mini-apps.com/)
-- [@telegram-apps/sdk-vue documentation](https://docs.telegram-mini-apps.com/packages/telegram-apps-sdk-vue)
-- [Telegram developers community chat](https://t.me/devs)
+- [@tma.js/sdk-vue documentation](https://docs.telegram-mini-apps.com/packages/tma-js-sdk-vue)
+- [Telegram developers community chat](https://t.me/devs_cis)

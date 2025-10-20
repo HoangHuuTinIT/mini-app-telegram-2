@@ -38,7 +38,7 @@ const nonIndexRoutes = computed(() => routes.filter((r) => !!r.meta?.title));
   gap: 5px;
 }
 
-.index-page__link-item+.index-page__link-item {
+.index-page__link-item + .index-page__link-item {
   margin-top: 10px;
 }
 

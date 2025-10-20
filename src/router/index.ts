@@ -44,7 +44,7 @@ export const routes = [
       icon: IconTonConnect,
       title: 'TON Connect',
     },
-  }
+  },
 ];
 
 const router = createRouter({
