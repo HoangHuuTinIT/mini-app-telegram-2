@@ -77,8 +77,8 @@ const showPopup = async () => {
       title: 'Xác nhận giao dịch',
       message: 'Bạn có chắc chắn muốn thanh toán 100.000đ?',
       buttons: [
-        { id: 'ok', type: 'ok', text: 'Đồng ý' },
-        { id: 'cancel', type: 'cancel', text: 'Hủy' },
+        { id: 'Đồng ý', type: 'ok', text: 'Đồng ý' },
+        { id: 'Hủy', type: 'cancel', text: 'Hủy' },
       ],
     });
     alert(`Bạn đã bấm nút: ${buttonId}`);
