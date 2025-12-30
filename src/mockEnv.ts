@@ -113,6 +113,26 @@ if (!await isTMA('complete')) {
           window.Android.closeApp();
         }
       }
+
+      // Handle Open Link (External Browser or Deep Link)
+      if (e.name === 'web_app_open_link') {
+        const { url } = (e as any).params || {};
+        if (window.Android && url) {
+          window.Android.openLink(url);
+        } else if (url) {
+          window.open(url, '_blank');
+        }
+      }
+
+      // Handle Telegram Link (Internal Navigation)
+      if (e.name === 'web_app_open_telegram_link') {
+        const { url } = (e as any).params || {};
+        if (window.Android && url) {
+          window.Android.openTelegramLink(url);
+        } else if (url) {
+          window.open(url, '_blank');
+        }
+      }
     },
     launchParams: new URLSearchParams([
       // Discover more launch parameters:

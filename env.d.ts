@@ -14,6 +14,8 @@ declare global {
             openPopup(title: string, message: string, buttonsJson: string): void;
             hapticFeedback(type: string, style: string): void;
             requestTheme(): void;
+            openLink(url: string): void;
+            openTelegramLink(url: string): void;
         };
         onAndroidPopupClosed(button_id: string): void;
         updateTheme(themeParamsJson: string): void;
