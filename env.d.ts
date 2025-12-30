@@ -11,6 +11,9 @@ declare global {
             setMainButtonText(text: string): void;
             setMainButtonVisible(isVisible: boolean): void;
             setMainButtonColor(color: string): void;
+            openPopup(title: string, message: string, buttonsJson: string): void;
+            hapticFeedback(type: string, style: string): void;
         };
+        onAndroidPopupClosed(button_id: string): void;
     }
 }

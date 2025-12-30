@@ -10,6 +10,7 @@ import {
   miniApp,
   backButton,
   mainButton,
+  popup,
 } from '@tma.js/sdk-vue';
 
 /**

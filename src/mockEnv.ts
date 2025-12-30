@@ -76,6 +76,36 @@ if (!await isTMA('complete')) {
           emitEvent('main_button_settings_changed', { is_visible });
         }
       }
+
+      // Handle Popup
+      if (e.name === 'web_app_open_popup') {
+        const { title, message, buttons } = (e as any).title !== undefined ? e as any : (e as any).params || {};
+
+        if (window.Android) {
+          // Serialize buttons to JSON string to pass to Android
+          const buttonsJson = JSON.stringify(buttons || []);
+          try {
+            window.Android.openPopup(title || '', message || '', buttonsJson);
+          } catch (err) {
+            alert(`Error calling window.Android.openPopup: ${err}`);
+          }
+        } else {
+          // Fallback for browser testing
+          alert(`[Popup] ${title}: ${message}`);
+        }
+      }
+
+      // Handle Haptic Feedback
+      if (e.name === 'web_app_trigger_haptic_feedback') {
+        const { type, impact_style, notification_type } = (e as any).params || {};
+        if (window.Android) {
+          let style = '';
+          if (type === 'impact') style = impact_style || '';
+          if (type === 'notification') style = notification_type || '';
+
+          window.Android.hapticFeedback(type, style);
+        }
+      }
     },
     launchParams: new URLSearchParams([
       // Discover more launch parameters:
@@ -110,6 +140,11 @@ if (!await isTMA('complete')) {
       ['tgWebAppPlatform', 'android_webview'], // Custom platform name
     ]),
   });
+
+  // Listen for Android Popup Callback
+  window.onAndroidPopupClosed = (buttonId: string) => {
+    emitEvent('popup_closed', { button_id: buttonId });
+  };
 
   console.info(
     '⚠️ Environment mocked for Android WebView integration.',

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue';
 import { routes } from '@/router';
-import { mainButton, useSignal } from '@tma.js/sdk-vue';
+import { mainButton, useSignal, popup, hapticFeedback } from '@tma.js/sdk-vue';
 import AppPage from '@/components/AppPage.vue';
 import AppLink from '@/components/AppLink.vue';
 
@@ -47,15 +47,45 @@ const showNativeToast = () => {
   }
 };
 
-const nativeVibrate = () => {
-  if (window.Android) {
-    window.Android.vibrate();
+
+
+const triggerImpact = (style: 'light' | 'medium' | 'heavy') => {
+  if (hapticFeedback.isSupported()) {
+    hapticFeedback.impactOccurred(style);
+  }
+};
+
+const triggerNotification = (type: 'success' | 'warning' | 'error') => {
+  if (hapticFeedback.isSupported()) {
+    hapticFeedback.notificationOccurred(type);
+  }
+};
+
+const triggerSelection = () => {
+  if (hapticFeedback.isSupported()) {
+    hapticFeedback.selectionChanged();
   }
 };
 
 const closeNativeApp = () => {
   if (window.Android) {
     window.Android.closeApp();
+  }
+};
+
+const showPopup = async () => {
+  try {
+    const buttonId = await (popup as any).show({
+      title: 'Xác nhận giao dịch',
+      message: 'Bạn có chắc chắn muốn thanh toán 100.000đ?',
+      buttons: [
+        { id: 'ok', type: 'ok', text: 'Đồng ý' },
+        { id: 'cancel', type: 'cancel', text: 'Hủy' },
+      ],
+    });
+    alert(`Bạn đã bấm nút: ${buttonId}`);
+  } catch (e) {
+    // Ignore catch
   }
 };
 </script>
@@ -81,7 +111,11 @@ const closeNativeApp = () => {
       <h3>🤖 Android Native Controls</h3>
       <div class="button-group">
         <button @click="showNativeToast">Toast "Hello"</button>
-        <button @click="nativeVibrate">Rung (Vibrate)</button>
+        <button @click="() => triggerImpact('light')">Rung Nhẹ</button>
+        <button @click="() => triggerImpact('heavy')">Rung Mạnh</button>
+        <button @click="() => triggerNotification('success')">Rung Success</button>
+        <button @click="() => triggerNotification('error')">Rung Error</button>
+        <button @click="triggerSelection">Rung Selection</button>
         <button @click="closeNativeApp" class="btn-danger">Đóng App</button>
       </div>
     </div>
@@ -95,6 +129,14 @@ const closeNativeApp = () => {
         </button>
         <button @click="updateMainButtonText">Đổi tên "Thanh Toán"</button>
         <button @click="updateMainButtonColor">Đổi màu Hồng</button>
+      </div>
+    </div>
+
+    <!-- Popup Demo -->
+    <div class="native-controls">
+      <h3>💬 Popup Demo</h3>
+      <div class="button-group">
+        <button @click="showPopup">Hiện Popup Chuẩn</button>
       </div>
     </div>
   </AppPage>
