@@ -77,6 +77,29 @@ if (!await isTMA('complete')) {
         }
       }
 
+      // Handle Back Button setup
+      if (e.name === 'web_app_setup_back_button') {
+        const { is_visible } = (e as any).is_visible !== undefined ? e as any : (e as any).params || {};
+        // alert(`DEBUG: web_app_setup_back_button received. Visible: ${is_visible}`);
+        if (window.Android && typeof is_visible === 'boolean') {
+          window.Android.setBackButtonVisible(is_visible);
+        }
+        if (typeof is_visible === 'boolean') {
+          emitEvent('back_button_settings_changed', { is_visible });
+        }
+      }
+
+      // Handle Header Color setup
+      if (e.name === 'web_app_set_header_color') {
+        const { color } = (e as any).color !== undefined ? e as any : (e as any).params || {};
+        if (window.Android && color) {
+          window.Android.setHeaderColor(color);
+        }
+        if (color) {
+          emitEvent('header_color_changed', { color });
+        }
+      }
+
       // Handle Popup
       if (e.name === 'web_app_open_popup') {
         const { title, message, buttons } = (e as any).title !== undefined ? e as any : (e as any).params || {};
@@ -239,12 +262,25 @@ if (!await isTMA('complete')) {
           alert("QR Code Scanner not available in this emulated environment.");
         }
       },
+      setHeaderColor: (color: string) => {
+        // Trigger Android Native Action
+        if (window.Android && window.Android.setHeaderColor) {
+          window.Android.setHeaderColor(color);
+        } else if (window.Android) {
+          alert("setHeaderColor not implemented in native " + (window.Android ? "Android" : "mock"));
+        }
+      },
       // Minimal mocks to prevent crashes if other things are accessed
       onEvent: () => { },
       offEvent: () => { },
       postEvent: () => { },
     };
   }
+
+  // Listen for Android Back Button Pressed
+  window.addEventListener('back_button_pressed', () => {
+    emitEvent('back_button_pressed');
+  });
 
   console.info(
     '⚠️ Environment and Telegram Global mocked for Android WebView integration.',

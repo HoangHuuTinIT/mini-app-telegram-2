@@ -9,6 +9,7 @@ export function useBackButton() {
   const router = useRouter();
 
   watch(() => route.name, () => {
+    // alert(`DEBUG: useBackButton route changed to ${String(route.name)}`);
     if (route.name === 'index') {
       backButton.hide();
       offClick();
@@ -16,7 +17,7 @@ export function useBackButton() {
       backButton.show();
       offClick = backButton.onClick(onBackButtonClick);
     }
-  });
+  }, { immediate: true });
 
   async function onBackButtonClick(): Promise<void> {
     await router.go(-1);

@@ -101,6 +101,16 @@ const scanQr = () => {
     alert("Không tìm thấy đối tượng Telegram WebApp!");
   }
 };
+
+const changeHeaderColor = (color: string) => {
+  const webApp = (window as any).Telegram?.WebApp;
+  if (webApp && webApp.setHeaderColor) {
+    webApp.setHeaderColor(color);
+  } else {
+      // Fallback if using sdk directly (though polyfill handles webApp global)
+      alert("setHeaderColor not supported in this env");
+  }
+};
 </script>
 
 <template>
@@ -130,6 +140,11 @@ const scanQr = () => {
         <button @click="() => triggerNotification('error')">Rung Error</button>
         <button @click="triggerSelection">Rung Selection</button>
         <button @click="scanQr">📷 Quét QRCode</button>
+        <div class="test-row">
+           <button @click="() => changeHeaderColor('#ff0000')">Header Đỏ</button>
+           <button @click="() => changeHeaderColor('#008000')">Header Xanh</button>
+           <button @click="() => changeHeaderColor('secondary_bg_color')">Header Theme</button>
+        </div>
         <button @click="closeNativeApp" class="btn-danger">Đóng App</button>
       </div>
     </div>

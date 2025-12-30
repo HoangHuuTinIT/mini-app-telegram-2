@@ -17,6 +17,8 @@ declare global {
             openLink(url: string): void;
             openTelegramLink(url: string): void;
             scanQrCode(): void;
+            setBackButtonVisible(visible: boolean): void;
+            setHeaderColor(color: string): void;
         };
         onAndroidPopupClosed(button_id: string): void;
         onAndroidQrScanned(content: string): void; // Callback for QR Scan result
