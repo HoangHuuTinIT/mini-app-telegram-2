@@ -11,6 +11,7 @@ import {
   backButton,
   mainButton,
   popup,
+  settingsButton, // Added settingsButton
 } from '@tma.js/sdk-vue';
 
 /**
@@ -64,6 +65,7 @@ export async function init(options: {
   // Mount all components used in the project.
   backButton.mount.ifAvailable();
   mainButton.mount.ifAvailable();
+  settingsButton.mount.ifAvailable();
   initData.restore();
 
   if (miniApp.mount.isAvailable()) {

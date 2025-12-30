@@ -19,6 +19,7 @@ declare global {
             scanQrCode(): void;
             setBackButtonVisible(visible: boolean): void;
             setHeaderColor(color: string): void;
+            setSettingsButtonVisible(visible: boolean): void;
         };
         onAndroidPopupClosed(button_id: string): void;
         onAndroidQrScanned(content: string): void; // Callback for QR Scan result

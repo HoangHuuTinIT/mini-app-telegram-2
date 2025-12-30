@@ -1,11 +1,31 @@
+```vue
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue';
 import { routes } from '@/router';
-import { mainButton, useSignal, popup, hapticFeedback, miniApp } from '@tma.js/sdk-vue';
+import { mainButton, useSignal, popup, hapticFeedback, miniApp, initData, settingsButton, type User } from '@tma.js/sdk-vue';
 import AppPage from '@/components/AppPage.vue';
 import AppLink from '@/components/AppLink.vue';
+import { useBackButton } from '@/composables/useBackButton';
+import { useRouter } from 'vue-router';
 
 const nonIndexRoutes = computed(() => routes.filter((r) => !!r.meta?.title));
+
+const initDataRow = useSignal(initData.state);
+const user = useSignal<User | undefined>(initData.user);
+const router = useRouter();
+
+useBackButton();
+
+// Setup Settings Button
+onMounted(() => {
+  if (settingsButton.mount.isAvailable()) {
+    settingsButton.show();
+    settingsButton.onClick(() => {
+      // Navigate to Theme Params page when Settings button is clicked
+      router.push({ name: 'theme-params' });
+    });
+  }
+});
 
 const isAndroidHost = ref(false);
 
@@ -29,6 +49,7 @@ const toggleMainButton = () => {
   if (mainButton.isVisible()) {
     mainButton.hide();
   } else {
+    mainButton.setText("Nút Chính"); // Set default text explicitly
     mainButton.show();
   }
 };

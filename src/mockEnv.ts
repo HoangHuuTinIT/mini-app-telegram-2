@@ -100,6 +100,18 @@ if (!await isTMA('complete')) {
         }
       }
 
+      // Handle Settings Button setup
+      if (e.name === 'web_app_setup_settings_button') {
+        const { is_visible } = (e as any).is_visible !== undefined ? e as any : (e as any).params || {};
+        if (window.Android && typeof is_visible === 'boolean') {
+          window.Android.setSettingsButtonVisible(is_visible);
+        }
+        if (typeof is_visible === 'boolean') {
+          emitEvent('settings_button_settings_changed', { is_visible });
+        }
+      }
+
+
       // Handle Popup
       if (e.name === 'web_app_open_popup') {
         const { title, message, buttons } = (e as any).title !== undefined ? e as any : (e as any).params || {};
@@ -280,6 +292,11 @@ if (!await isTMA('complete')) {
   // Listen for Android Back Button Pressed
   window.addEventListener('back_button_pressed', () => {
     emitEvent('back_button_pressed');
+  });
+
+  // Listen for Settings Button Pressed
+  window.addEventListener('settings_button_pressed', () => {
+    emitEvent('settings_button_pressed');
   });
 
   console.info(
