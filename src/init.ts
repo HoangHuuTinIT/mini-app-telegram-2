@@ -9,6 +9,7 @@ import {
   emitEvent,
   miniApp,
   backButton,
+  mainButton,
 } from '@tma.js/sdk-vue';
 
 /**
@@ -61,6 +62,7 @@ export async function init(options: {
 
   // Mount all components used in the project.
   backButton.mount.ifAvailable();
+  mainButton.mount.ifAvailable();
   initData.restore();
 
   if (miniApp.mount.isAvailable()) {
