@@ -1,10 +1,35 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 import { routes } from '@/router';
 import AppPage from '@/components/AppPage.vue';
 import AppLink from '@/components/AppLink.vue';
 
 const nonIndexRoutes = computed(() => routes.filter((r) => !!r.meta?.title));
+
+const isAndroidHost = ref(false);
+
+onMounted(() => {
+  // Check if running inside Android Host
+  isAndroidHost.value = !!window.Android;
+});
+
+const showNativeToast = () => {
+  if (window.Android) {
+    window.Android.showToast("Lời chào từ Vue.js gửi tới Android!");
+  }
+};
+
+const nativeVibrate = () => {
+  if (window.Android) {
+    window.Android.vibrate();
+  }
+};
+
+const closeNativeApp = () => {
+  if (window.Android) {
+    window.Android.closeApp();
+  }
+};
 </script>
 
 <template>
@@ -23,10 +48,51 @@ const nonIndexRoutes = computed(() => routes.filter((r) => !!r.meta?.title));
         </AppLink>
       </li>
     </ul>
+
+    <div v-if="isAndroidHost" class="native-controls">
+      <h3>🤖 Android Native Controls</h3>
+      <div class="button-group">
+        <button @click="showNativeToast">Toast "Hello"</button>
+        <button @click="nativeVibrate">Rung (Vibrate)</button>
+        <button @click="closeNativeApp" class="btn-danger">Đóng App</button>
+      </div>
+    </div>
   </AppPage>
 </template>
 
 <style scoped>
+.native-controls {
+  margin-top: 20px;
+  padding: 15px;
+  background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+  border-radius: 12px;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: var(--tg-theme-button-color, #3390ec);
+  color: var(--tg-theme-button-text-color, #ffffff);
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:active {
+  opacity: 0.8;
+}
+
+.btn-danger {
+  background: var(--tg-theme-destructive-text-color, #ff3b30);
+}
+
 .index-page__links {
   list-style: none;
   padding-left: 0;
