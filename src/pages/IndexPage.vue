@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue';
 import { routes } from '@/router';
+import { mainButton, useSignal } from '@tma.js/sdk-vue';
 import AppPage from '@/components/AppPage.vue';
 import AppLink from '@/components/AppLink.vue';
 
@@ -8,10 +9,37 @@ const nonIndexRoutes = computed(() => routes.filter((r) => !!r.meta?.title));
 
 const isAndroidHost = ref(false);
 
+const isMainButtonVisible = useSignal(mainButton.isVisible);
+
 onMounted(() => {
   // Check if running inside Android Host
   isAndroidHost.value = !!window.Android;
+
+  // Setup Main Button click listener from SDK
+  mainButton.onClick(() => {
+    if (window.Android) {
+      window.Android.showToast("Đã bấm nút Main Button!");
+    } else {
+      alert("Main Button Clicked!");
+    }
+  });
 });
+
+const toggleMainButton = () => {
+  if (mainButton.isVisible()) {
+    mainButton.hide();
+  } else {
+    mainButton.show();
+  }
+};
+
+const updateMainButtonText = () => {
+  mainButton.setText("THANH TOÁN NGAY");
+};
+
+const updateMainButtonColor = () => {
+  mainButton.setBgColor("#ff4081"); // Pink color
+};
 
 const showNativeToast = () => {
   if (window.Android) {
@@ -55,6 +83,18 @@ const closeNativeApp = () => {
         <button @click="showNativeToast">Toast "Hello"</button>
         <button @click="nativeVibrate">Rung (Vibrate)</button>
         <button @click="closeNativeApp" class="btn-danger">Đóng App</button>
+      </div>
+    </div>
+
+    <!-- Main Button Demo -->
+    <div class="native-controls">
+      <h3>🚀 Main Button</h3>
+      <div class="button-group">
+        <button @click="toggleMainButton">
+          {{ isMainButtonVisible ? 'Ẩn' : 'Hiện' }} Nút Chính
+        </button>
+        <button @click="updateMainButtonText">Đổi tên "Thanh Toán"</button>
+        <button @click="updateMainButtonColor">Đổi màu Hồng</button>
       </div>
     </div>
   </AppPage>

@@ -54,6 +54,28 @@ if (!await isTMA('complete')) {
       if (e.name === 'web_app_request_safe_area') {
         return emitEvent('safe_area_changed', noInsets);
       }
+
+      // Handle Main Button setup
+      if (e.name === 'web_app_setup_main_button') {
+        const { is_visible, text, color } = (e as any).is_visible !== undefined ? e as any : (e as any).params || {};
+
+        // Forward to Android if available
+        if (window.Android) {
+          if (typeof is_visible === 'boolean') {
+            window.Android.setMainButtonVisible(is_visible);
+          }
+          if (text) {
+            window.Android.setMainButtonText(text);
+          }
+          if (color) {
+            window.Android.setMainButtonColor(color);
+          }
+        }
+        // Also emit event back to SDK to confirm the change (mocking the behavior)
+        if (typeof is_visible === 'boolean') {
+          emitEvent('main_button_settings_changed', { is_visible });
+        }
+      }
     },
     launchParams: new URLSearchParams([
       // Discover more launch parameters:
