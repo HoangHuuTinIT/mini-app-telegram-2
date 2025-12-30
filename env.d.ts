@@ -16,8 +16,10 @@ declare global {
             requestTheme(): void;
             openLink(url: string): void;
             openTelegramLink(url: string): void;
+            scanQrCode(): void;
         };
         onAndroidPopupClosed(button_id: string): void;
+        onAndroidQrScanned(content: string): void; // Callback for QR Scan result
         updateTheme(themeParamsJson: string): void;
     }
 }

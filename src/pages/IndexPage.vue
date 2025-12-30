@@ -86,6 +86,21 @@ const showPopup = async () => {
     // Ignore catch
   }
 };
+
+const scanQr = () => {
+  // Use the raw Telegram WebApp object to bypass SDK wrapper limitations
+  const webApp = (window as any).Telegram?.WebApp;
+  if (webApp && webApp.showScanQrPopup) {
+    webApp.showScanQrPopup({
+      text: 'Vui lòng quét bất kỳ mã QR nào để test...'
+    }, (text: string) => {
+      alert(`Đã quét được: ${text}`);
+      return true; // Return true to close the popup handling
+    });
+  } else {
+    alert("Không tìm thấy đối tượng Telegram WebApp!");
+  }
+};
 </script>
 
 <template>
@@ -114,6 +129,7 @@ const showPopup = async () => {
         <button @click="() => triggerNotification('success')">Rung Success</button>
         <button @click="() => triggerNotification('error')">Rung Error</button>
         <button @click="triggerSelection">Rung Selection</button>
+        <button @click="scanQr">📷 Quét QRCode</button>
         <button @click="closeNativeApp" class="btn-danger">Đóng App</button>
       </div>
     </div>

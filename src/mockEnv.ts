@@ -133,6 +133,17 @@ if (!await isTMA('complete')) {
           window.open(url, '_blank');
         }
       }
+
+      // Handle QR Scanner
+      if (e.name === 'web_app_open_scan_qr_popup') {
+        if (window.Android && window.Android.scanQrCode) {
+          window.Android.scanQrCode();
+        } else {
+          alert("QR Scanner not supported on this device/emulator");
+          // Simulate a scan for testing if needed
+          // setTimeout(() => window.onAndroidQrScanned("https://t.me/example"), 2000);
+        }
+      }
     },
     launchParams: new URLSearchParams([
       // Discover more launch parameters:
@@ -173,6 +184,20 @@ if (!await isTMA('complete')) {
     emitEvent('popup_closed', { button_id: buttonId });
   };
 
+  // Listen for QR Code Scan Result
+  window.onAndroidQrScanned = (content: string) => {
+    // 1. Emit the text received event to the Mini App
+    emitEvent('qr_text_received', { data: content });
+
+    // 2. Call the polyfill callback if it exists (set by showScanQrPopup)
+    if ((window as any)._qrCallback) {
+      (window as any)._qrCallback(content);
+    }
+
+    // 3. Automatically close the "popup" state in the SDK (since Native UI is gone)
+    emitEvent('scan_qr_popup_closed');
+  };
+
   // Listen for Android Theme Updates
   window.updateTheme = (themeParamsJson: string) => {
     // alert(`DEBUG: Received Theme JSON: ${themeParamsJson}`); // Uncomment for heavy debugging
@@ -191,8 +216,38 @@ if (!await isTMA('complete')) {
     window.Android.requestTheme();
   }
 
+  // --- POLYFILL for window.Telegram.WebApp ---
+  // This allows direct usage of Telegram globals (bypassing the SDK wrapper)
+  if (!(window as any).Telegram) {
+    (window as any).Telegram = {};
+  }
+  if (!(window as any).Telegram.WebApp) {
+    (window as any).Telegram.WebApp = {
+      initData: '',
+      initDataUnsafe: {},
+      version: '6.4',
+      platform: 'android',
+      showScanQrPopup: (params: any, callback?: (text: string) => boolean) => {
+        // Store callback to be called later
+        if (callback) {
+          (window as any)._qrCallback = callback;
+        }
+        // Trigger Android Native Action
+        if (window.Android && window.Android.scanQrCode) {
+          window.Android.scanQrCode();
+        } else {
+          alert("QR Code Scanner not available in this emulated environment.");
+        }
+      },
+      // Minimal mocks to prevent crashes if other things are accessed
+      onEvent: () => { },
+      offEvent: () => { },
+      postEvent: () => { },
+    };
+  }
+
   console.info(
-    '⚠️ Environment mocked for Android WebView integration.',
+    '⚠️ Environment and Telegram Global mocked for Android WebView integration.',
   );
 }
 // }
