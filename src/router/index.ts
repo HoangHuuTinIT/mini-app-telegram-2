@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHashHistory } from 'vue-router';
 import IndexPage from '@/pages/IndexPage.vue';
 import InitDataPage from '@/pages/InitDataPage.vue';
 import ThemeParamsPage from '@/pages/ThemeParamsPage.vue';
@@ -48,7 +48,7 @@ export const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(import.meta.env.BASE_URL),
   routes,
 });
 

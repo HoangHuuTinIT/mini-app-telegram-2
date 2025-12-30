@@ -7,7 +7,7 @@ import mkcert from 'vite-plugin-mkcert'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/vuejs-template',
+  base: './',
   plugins: [
     vue(),
     vueDevTools(),
@@ -25,5 +25,8 @@ export default defineConfig({
   server: {
     // Exposes your dev server and makes it accessible for the devices in the same network.
     host: true,
+  },
+  build: {
+    target: 'esnext',
   },
 })
