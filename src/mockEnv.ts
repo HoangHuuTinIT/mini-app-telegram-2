@@ -106,6 +106,13 @@ if (!await isTMA('complete')) {
           window.Android.hapticFeedback(type, style);
         }
       }
+
+      // Handle Close App
+      if (e.name === 'web_app_close') {
+        if (window.Android) {
+          window.Android.closeApp();
+        }
+      }
     },
     launchParams: new URLSearchParams([
       // Discover more launch parameters:
@@ -145,6 +152,24 @@ if (!await isTMA('complete')) {
   window.onAndroidPopupClosed = (buttonId: string) => {
     emitEvent('popup_closed', { button_id: buttonId });
   };
+
+  // Listen for Android Theme Updates
+  window.updateTheme = (themeParamsJson: string) => {
+    // alert(`DEBUG: Received Theme JSON: ${themeParamsJson}`); // Uncomment for heavy debugging
+    try {
+      const parsedParams = JSON.parse(themeParamsJson);
+      // alert(`DEBUG: Parsed Theme Color: ${parsedParams.bg_color}`);
+      emitEvent('theme_changed', { theme_params: parsedParams });
+    } catch (e) {
+      alert(`ERROR parsing theme: ${e}`);
+    }
+  };
+
+  // Request initial theme from Android (Pull mechanism to avoid race conditions)
+  if (window.Android && window.Android.requestTheme) {
+    // alert('DEBUG: Requesting initial theme from Android...');
+    window.Android.requestTheme();
+  }
 
   console.info(
     '⚠️ Environment mocked for Android WebView integration.',

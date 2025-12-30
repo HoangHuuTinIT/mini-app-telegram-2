@@ -13,7 +13,9 @@ declare global {
             setMainButtonColor(color: string): void;
             openPopup(title: string, message: string, buttonsJson: string): void;
             hapticFeedback(type: string, style: string): void;
+            requestTheme(): void;
         };
         onAndroidPopupClosed(button_id: string): void;
+        updateTheme(themeParamsJson: string): void;
     }
 }

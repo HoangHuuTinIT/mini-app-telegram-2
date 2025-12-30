@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue';
 import { routes } from '@/router';
-import { mainButton, useSignal, popup, hapticFeedback } from '@tma.js/sdk-vue';
+import { mainButton, useSignal, popup, hapticFeedback, miniApp } from '@tma.js/sdk-vue';
 import AppPage from '@/components/AppPage.vue';
 import AppLink from '@/components/AppLink.vue';
 
@@ -68,9 +68,7 @@ const triggerSelection = () => {
 };
 
 const closeNativeApp = () => {
-  if (window.Android) {
-    window.Android.closeApp();
-  }
+  miniApp.close();
 };
 
 const showPopup = async () => {
