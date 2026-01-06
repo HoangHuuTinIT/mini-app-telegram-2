@@ -29,9 +29,14 @@ declare global {
       cloudStorageGetItem(key: string): string;
       cloudStorageRemoveItem(key: string): void;
       cloudStorageGetKeys(): string;  // Returns JSON array of keys
+      // Biometric methods
+      biometricInit(): string;  // Returns JSON with biometric info
+      biometricAuthenticate(reason: string): void;
+      biometricOpenSettings(): void;
     };
     onAndroidPopupClosed(button_id: string): void;
     onAndroidQrScanned(content: string): void; // Callback for QR Scan result
     updateTheme(themeParamsJson: string): void;
+    onBiometricResult(success: boolean, token: string): void;  // Callback for biometric result
   }
 }

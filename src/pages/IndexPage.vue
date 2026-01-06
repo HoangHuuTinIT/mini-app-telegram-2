@@ -167,6 +167,60 @@ const getAllKeys = async () => {
   }
 };
 
+// Biometric state and functions
+const biometricResult = ref('');
+const biometricInfo = ref({
+  available: false,
+  type: '',
+});
+
+const checkBiometric = () => {
+  if (window.Android && window.Android.biometricInit) {
+    try {
+      const info = JSON.parse(window.Android.biometricInit());
+      biometricInfo.value = info;
+      biometricResult.value = info.available
+        ? `✅ Biometric có sẵn: ${info.type}`
+        : '❌ Biometric không khả dụng';
+    } catch (e) {
+      biometricResult.value = `❌ Lỗi: ${e}`;
+    }
+  } else {
+    biometricResult.value = '⚠️ Không hỗ trợ (chạy trên browser)';
+  }
+};
+
+const authenticateBiometric = () => {
+  biometricResult.value = '⏳ Đang chờ xác thực...';
+
+  // Setup callback to receive result
+  window.onBiometricResult = (success: boolean, token: string) => {
+    if (success) {
+      biometricResult.value = `✅ Xác thực thành công! Token: ${token.substring(0, 20)}...`;
+    } else {
+      biometricResult.value = '❌ Xác thực thất bại';
+    }
+  };
+
+  if (window.Android && window.Android.biometricAuthenticate) {
+    window.Android.biometricAuthenticate('Xác thực để truy cập tính năng bảo mật');
+  } else {
+    // Simulate for browser
+    setTimeout(() => {
+      biometricResult.value = '✅ (Mock) Xác thực thành công!';
+    }, 1000);
+  }
+};
+
+const openBiometricSettings = () => {
+  if (window.Android && window.Android.biometricOpenSettings) {
+    window.Android.biometricOpenSettings();
+    biometricResult.value = '📱 Đã mở Settings...';
+  } else {
+    biometricResult.value = '⚠️ Không hỗ trợ mở Settings';
+  }
+};
+
 const showPopup = async () => {
   try {
     const buttonId = await (popup as any).show({
@@ -305,6 +359,19 @@ const changeHeaderColor = (color: string) => {
       </div>
       <div v-if="cloudStorageResult" class="storage-result">
         {{ cloudStorageResult }}
+      </div>
+    </div>
+
+    <!-- Biometric Demo -->
+    <div class="native-controls">
+      <h3>🔐 Biometric Authentication</h3>
+      <div class="button-group">
+        <button @click="checkBiometric">🔍 Kiểm tra</button>
+        <button @click="authenticateBiometric">👆 Xác thực</button>
+        <button @click="openBiometricSettings">⚙️ Settings</button>
+      </div>
+      <div v-if="biometricResult" class="storage-result">
+        {{ biometricResult }}
       </div>
     </div>
   </AppPage>

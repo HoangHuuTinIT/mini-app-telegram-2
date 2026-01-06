@@ -287,6 +287,54 @@ if (!await isTMA('complete')) {
           emitEvent('custom_method_invoked', { req_id, result: keys });
         }
       }
+
+      // Handle Biometric Manager - Get Info
+      if (e.name === 'web_app_biometry_get_info') {
+        let biometricInfo = {
+          available: false,
+          type: '',
+          access_requested: false,
+          access_granted: false,
+          device_id: '',
+          token_saved: false,
+        };
+
+        if (window.Android && window.Android.biometricInit) {
+          try {
+            biometricInfo = JSON.parse(window.Android.biometricInit());
+          } catch {
+            // Keep default info
+          }
+        }
+
+        emitEvent('biometry_info_received', biometricInfo);
+      }
+
+      // Handle Biometric Manager - Request Auth
+      if (e.name === 'web_app_biometry_request_auth') {
+        const params = (e as any).params || {};
+        const { reason } = params;
+
+        if (window.Android && window.Android.biometricAuthenticate) {
+          window.Android.biometricAuthenticate(reason || 'Xác thực sinh trắc học');
+        } else {
+          // Fallback: simulate success for browser testing
+          setTimeout(() => {
+            emitEvent('biometry_auth_requested', {
+              status: 'authorized',
+              token: 'mock_biometric_token_' + Date.now(),
+            });
+          }, 1000);
+        }
+      }
+
+      // Handle Biometric Manager - Open Settings
+      if (e.name === 'web_app_biometry_open_settings') {
+        if (window.Android && window.Android.biometricOpenSettings) {
+          window.Android.biometricOpenSettings();
+        }
+        emitEvent('biometry_settings_received', { status: 'opened' });
+      }
     },
     launchParams: new URLSearchParams([
       // Discover more launch parameters:
@@ -367,6 +415,21 @@ if (!await isTMA('complete')) {
       is_expanded: true,
       is_state_stable: true,
     });
+  };
+
+  // Listen for Biometric Result from Android
+  window.onBiometricResult = (success: boolean, token: string) => {
+    if (success) {
+      emitEvent('biometry_auth_requested', {
+        status: 'authorized',
+        token: token,
+      });
+    } else {
+      emitEvent('biometry_auth_requested', {
+        status: 'failed',
+        token: '',
+      });
+    }
   };
 
   // --- POLYFILL for window.Telegram.WebApp ---
