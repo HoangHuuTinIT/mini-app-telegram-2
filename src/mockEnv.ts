@@ -57,7 +57,7 @@ if (!await isTMA('complete')) {
 
       // Handle Main Button setup
       if (e.name === 'web_app_setup_main_button') {
-        const { is_visible, text, color, is_active } = (e as any).is_visible !== undefined ? e as any : (e as any).params || {};
+        const { is_visible, text, color, is_active, is_progress_visible } = (e as any).is_visible !== undefined ? e as any : (e as any).params || {};
 
         // Forward to Android if available
         if (window.Android) {
@@ -73,6 +73,9 @@ if (!await isTMA('complete')) {
           if (typeof is_active === 'boolean') {
             window.Android.setMainButtonEnabled(is_active);
           }
+          if (typeof is_progress_visible === 'boolean') {
+            window.Android.setMainButtonProgress(is_progress_visible);
+          }
         }
         // Also emit event back to SDK to confirm the change (mocking the behavior)
         if (typeof is_visible === 'boolean') {
@@ -80,6 +83,9 @@ if (!await isTMA('complete')) {
         }
         if (typeof is_active === 'boolean') {
           emitEvent('main_button_settings_changed', { is_active });
+        }
+        if (typeof is_progress_visible === 'boolean') {
+          emitEvent('main_button_settings_changed', { is_progress_visible });
         }
       }
 
@@ -145,6 +151,17 @@ if (!await isTMA('complete')) {
           if (type === 'notification') style = notification_type || '';
 
           window.Android.hapticFeedback(type, style);
+        }
+      }
+
+      // Handle Closing Behavior (confirmation before close)
+      if (e.name === 'web_app_setup_closing_behavior') {
+        const { need_confirmation } = (e as any).need_confirmation !== undefined ? e as any : (e as any).params || {};
+        if (window.Android && typeof need_confirmation === 'boolean') {
+          window.Android.setClosingConfirmation(need_confirmation);
+        }
+        if (typeof need_confirmation === 'boolean') {
+          emitEvent('closing_behavior_changed', { need_confirmation });
         }
       }
 

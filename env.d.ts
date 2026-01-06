@@ -12,6 +12,7 @@ declare global {
             setMainButtonVisible(isVisible: boolean): void;
             setMainButtonColor(color: string): void;
             setMainButtonEnabled(enabled: boolean): void;
+            setMainButtonProgress(isVisible: boolean): void;
             openPopup(title: string, message: string, buttonsJson: string): void;
             hapticFeedback(type: string, style: string): void;
             requestTheme(): void;
@@ -21,6 +22,7 @@ declare global {
             setBackButtonVisible(visible: boolean): void;
             setHeaderColor(color: string): void;
             setSettingsButtonVisible(visible: boolean): void;
+            setClosingConfirmation(needConfirmation: boolean): void;
         };
         onAndroidPopupClosed(button_id: string): void;
         onAndroidQrScanned(content: string): void; // Callback for QR Scan result

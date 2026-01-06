@@ -2,7 +2,7 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue';
 import { routes } from '@/router';
-import { mainButton, useSignal, popup, hapticFeedback, miniApp, initData, settingsButton, type User } from '@tma.js/sdk-vue';
+import { mainButton, useSignal, popup, hapticFeedback, miniApp, initData, settingsButton, closingBehavior, type User } from '@tma.js/sdk-vue';
 import AppPage from '@/components/AppPage.vue';
 import AppLink from '@/components/AppLink.vue';
 import { useBackButton } from '@/composables/useBackButton';
@@ -70,6 +70,14 @@ const disableMainButton = () => {
   mainButton.disable();
 };
 
+const showProgress = () => {
+  mainButton.setParams({ isLoaderVisible: true });
+};
+
+const hideProgress = () => {
+  mainButton.setParams({ isLoaderVisible: false });
+};
+
 const showNativeToast = () => {
   if (window.Android) {
     window.Android.showToast("Lời chào từ Vue.js gửi tới Android!");
@@ -98,6 +106,14 @@ const triggerSelection = () => {
 
 const closeNativeApp = () => {
   miniApp.close();
+};
+
+const enableCloseConfirmation = () => {
+  closingBehavior.enableConfirmation();
+};
+
+const disableCloseConfirmation = () => {
+  closingBehavior.disableConfirmation();
 };
 
 const showPopup = async () => {
@@ -189,6 +205,8 @@ const changeHeaderColor = (color: string) => {
         <button @click="updateMainButtonColor">Đổi màu Hồng</button>
         <button @click="enableMainButton">✅ Enable</button>
         <button @click="disableMainButton">🚫 Disable</button>
+        <button @click="showProgress">⏳ Loading</button>
+        <button @click="hideProgress">✓ Done</button>
       </div>
     </div>
 
@@ -197,6 +215,15 @@ const changeHeaderColor = (color: string) => {
       <h3>💬 Popup Demo</h3>
       <div class="button-group">
         <button @click="showPopup">Hiện Popup Chuẩn</button>
+      </div>
+    </div>
+
+    <!-- Closing Behavior Demo -->
+    <div class="native-controls">
+      <h3>🚪 Closing Behavior</h3>
+      <div class="button-group">
+        <button @click="enableCloseConfirmation">🔒 Bật Xác nhận đóng</button>
+        <button @click="disableCloseConfirmation">🔓 Tắt Xác nhận đóng</button>
       </div>
     </div>
   </AppPage>
