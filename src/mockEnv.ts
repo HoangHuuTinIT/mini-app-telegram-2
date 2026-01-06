@@ -197,12 +197,364 @@ if (!await isTMA('complete')) {
       }
 
       // Handle Telegram Link (Internal Navigation)
-      if (e.name === 'web_app_open_telegram_link') {
-        const { url } = (e as any).params || {};
+      if (e.name === 'web_app_open_tg_link' || e.name === 'web_app_open_telegram_link') {
+        const { path_full } = (e as any).params || {};
+        const url = path_full; // SDK sends path_full
+
+        if (url && url.includes('share/url') && window.Android && window.Android.shareText) {
+          // Handle Share URL: https://t.me/share/url?url={url}&text={text}
+          try {
+            const urlObj = new URL(url, 'https://t.me');
+            const text = urlObj.searchParams.get('text') || '';
+            const shareUrl = urlObj.searchParams.get('url') || '';
+            window.Android.shareText(`${text} ${shareUrl}`.trim());
+            return;
+          } catch (e) {
+            // Fallback
+          }
+        }
+
         if (window.Android && url) {
           window.Android.openTelegramLink(url);
         } else if (url) {
           window.open(url, '_blank');
+        }
+      }
+
+      // Handle Secondary Button
+      if (e.name === 'web_app_setup_secondary_button') {
+        const { text, color, is_active, is_visible, position, is_progress_visible } = (e as any).params || {};
+        if (window.Android) {
+          if (text !== undefined) window.Android.setSecondaryButtonText(text);
+          if (color !== undefined) window.Android.setSecondaryButtonColor(color);
+          if (is_active !== undefined) window.Android.setSecondaryButtonEnabled(is_active);
+          if (is_visible !== undefined) window.Android.setSecondaryButtonVisible(is_visible);
+          if (position !== undefined) window.Android.setSecondaryButtonPosition(position);
+          if (is_progress_visible !== undefined) window.Android.setSecondaryButtonProgress(is_progress_visible);
+        }
+      }
+
+      // Handle Swipe Behavior
+      if (e.name === 'web_app_setup_swipe_behavior') {
+        const { allow_vertical_swipe } = (e as any).params || {};
+        if (window.Android && window.Android.setSwipeEnabled) {
+          window.Android.setSwipeEnabled(allow_vertical_swipe);
+        }
+      }
+
+      // Handle Invoice
+      if (e.name === 'web_app_open_invoice') {
+        const { slug } = (e as any).params || {};
+        if (window.Android && window.Android.openInvoice) {
+          window.Android.openInvoice(slug);
+        } else {
+          alert(`[Mock Invoice] Opening invoice: ${slug}`);
+          // Simulate event
+          setTimeout(() => emitEvent('invoice_closed', { slug, status: 'paid' }), 2000);
+        }
+      }
+
+      // Handle Fullscreen
+      if (e.name === 'web_app_request_fullscreen') {
+        if (window.Android && window.Android.setFullscreen) {
+          window.Android.setFullscreen(true);
+        }
+      }
+      if (e.name === 'web_app_exit_fullscreen') {
+        if (window.Android && window.Android.setFullscreen) {
+          window.Android.setFullscreen(false);
+        }
+      }
+
+      // Handle Request Write Access
+      if (e.name === 'web_app_request_write_access') {
+        if (window.Android && window.Android.requestWriteAccess) {
+          window.Android.requestWriteAccess();
+        } else {
+          // Mock: simulate user granting access after 1 second
+          setTimeout(() => emitEvent('write_access_requested', { status: 'allowed' }), 1000);
+        }
+      }
+
+      // Handle Request Contact
+      if (e.name === 'web_app_request_phone') {
+        if (window.Android && window.Android.requestContact) {
+          window.Android.requestContact();
+        } else {
+          // Mock: simulate user sharing contact after 1 second
+          // Using CustomEvent because emitEvent type doesn't support contact property
+          setTimeout(() => {
+            window.dispatchEvent(new CustomEvent('phone_requested', {
+              detail: {
+                status: 'sent',
+                contact: {
+                  phone_number: '+84123456789',
+                  first_name: 'Mock',
+                  last_name: 'User',
+                  user_id: 999999999
+                }
+              }
+            }));
+          }, 1000);
+        }
+      }
+
+      // Handle Bottom Bar Color
+      if (e.name === 'web_app_set_bottom_bar_color') {
+        const { color } = (e as any).params || {};
+        if (window.Android && window.Android.setBottomBarColor) {
+          window.Android.setBottomBarColor(color);
+        } else {
+          // Mock: Just log and show toast
+          console.log('[Mock] Bottom Bar Color set to:', color);
+        }
+      }
+
+      // Handle Emoji Status
+      if (e.name === 'web_app_set_emoji_status') {
+        const { custom_emoji_id, duration } = (e as any).params || {};
+        if (window.Android && window.Android.setEmojiStatus) {
+          window.Android.setEmojiStatus(custom_emoji_id, duration);
+        } else {
+          // Mock: Simulate success after 1 second
+          setTimeout(() => {
+            window.dispatchEvent(new CustomEvent('emoji_status_set', {
+              detail: { success: true }
+            }));
+          }, 1000);
+        }
+      }
+
+      // Handle Add to Home Screen
+      if (e.name === 'web_app_add_to_home_screen') {
+        if (window.Android && window.Android.addToHomeScreen) {
+          window.Android.addToHomeScreen();
+        } else {
+          // Mock: Simulate success after 1 second
+          setTimeout(() => {
+            window.dispatchEvent(new CustomEvent('home_screen_added', {
+              detail: { status: 'added' }
+            }));
+          }, 1000);
+        }
+      }
+
+      // Handle Check Home Screen Status
+      if (e.name === 'web_app_check_home_screen') {
+        if (window.Android && window.Android.checkHomeScreenStatus) {
+          const status = window.Android.checkHomeScreenStatus();
+          window.dispatchEvent(new CustomEvent('home_screen_checked', {
+            detail: JSON.parse(status)
+          }));
+        } else {
+          // Mock: Return unknown status
+          window.dispatchEvent(new CustomEvent('home_screen_checked', {
+            detail: { status: 'unknown' }
+          }));
+        }
+      }
+
+      // Handle Start Accelerometer
+      if (e.name === 'web_app_start_accelerometer') {
+        const { refresh_rate } = (e as any).params || {};
+        if (window.Android && window.Android.startAccelerometer) {
+          window.Android.startAccelerometer(refresh_rate || 'default');
+        } else {
+          // Mock: Use browser DeviceMotion API if available
+          console.log('[Mock] Start Accelerometer with rate:', refresh_rate);
+        }
+      }
+
+      // Handle Stop Accelerometer
+      if (e.name === 'web_app_stop_accelerometer') {
+        if (window.Android && window.Android.stopAccelerometer) {
+          window.Android.stopAccelerometer();
+        }
+      }
+
+      // Handle Start Gyroscope
+      if (e.name === 'web_app_start_gyroscope') {
+        const { refresh_rate } = (e as any).params || {};
+        if (window.Android && window.Android.startGyroscope) {
+          window.Android.startGyroscope(refresh_rate || 'default');
+        } else {
+          console.log('[Mock] Start Gyroscope with rate:', refresh_rate);
+        }
+      }
+
+      // Handle Stop Gyroscope
+      if (e.name === 'web_app_stop_gyroscope') {
+        if (window.Android && window.Android.stopGyroscope) {
+          window.Android.stopGyroscope();
+        }
+      }
+
+      // Handle Start Device Orientation
+      if (e.name === 'web_app_start_device_orientation') {
+        const { refresh_rate, need_absolute } = (e as any).params || {};
+        if (window.Android && window.Android.startDeviceOrientation) {
+          window.Android.startDeviceOrientation(refresh_rate || 'default', need_absolute || false);
+        } else {
+          console.log('[Mock] Start Device Orientation with rate:', refresh_rate);
+        }
+      }
+
+      // Handle Stop Device Orientation
+      if (e.name === 'web_app_stop_device_orientation') {
+        if (window.Android && window.Android.stopDeviceOrientation) {
+          window.Android.stopDeviceOrientation();
+        }
+      }
+
+      // Handle Open Location Settings
+      if (e.name === 'web_app_open_location_settings') {
+        if (window.Android && window.Android.openLocationSettings) {
+          window.Android.openLocationSettings();
+        } else {
+          alert('[Mock] Opening Location Settings');
+        }
+      }
+
+      // Handle Get Current Location
+      if (e.name === 'web_app_get_current_location') {
+        if (window.Android && window.Android.getCurrentLocation) {
+          window.Android.getCurrentLocation();
+        } else {
+          // Mock: Use browser Geolocation API
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                window.dispatchEvent(new CustomEvent('location_received', {
+                  detail: {
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                    altitude: position.coords.altitude,
+                    accuracy: position.coords.accuracy,
+                    speed: position.coords.speed,
+                    heading: position.coords.heading
+                  }
+                }));
+              },
+              (error) => {
+                window.dispatchEvent(new CustomEvent('location_error', {
+                  detail: { error: error.message }
+                }));
+              }
+            );
+          } else {
+            // Mock location for desktop
+            window.dispatchEvent(new CustomEvent('location_received', {
+              detail: {
+                latitude: 10.762622,
+                longitude: 106.660172,
+                altitude: null,
+                accuracy: 100,
+                speed: null,
+                heading: null
+              }
+            }));
+          }
+        }
+      }
+
+      // Handle Share Story (Story Widget)
+      if (e.name === 'web_app_share_to_story') {
+        const { media_url, text, widget_link } = (e as any).params || {};
+        if (window.Android && window.Android.shareStory) {
+          window.Android.shareStory(
+            media_url || '',
+            text || '',
+            widget_link?.url || '',
+            widget_link?.name || ''
+          );
+        } else {
+          // Mock: Show what would be shared
+          console.log('[Mock] Share to Story:', { media_url, text, widget_link });
+          setTimeout(() => {
+            window.dispatchEvent(new CustomEvent('story_shared', {
+              detail: { success: true }
+            }));
+          }, 1000);
+        }
+      }
+
+      // Handle Download File
+      if (e.name === 'web_app_download_file') {
+        const { url, file_name } = (e as any).params || {};
+        if (window.Android && window.Android.downloadFile) {
+          window.Android.downloadFile(url || '', file_name || 'download');
+        } else {
+          // Mock: Open URL in new tab (simulates download)
+          console.log('[Mock] Download File:', { url, file_name });
+          window.open(url, '_blank');
+          setTimeout(() => {
+            window.dispatchEvent(new CustomEvent('file_download_started', {
+              detail: { success: true, url, file_name }
+            }));
+          }, 500);
+        }
+      }
+
+      // Handle Open Media Preview
+      if (e.name === 'web_app_open_media_preview') {
+        const { url, type } = (e as any).params || {};
+        if (window.Android && window.Android.openMediaPreview) {
+          window.Android.openMediaPreview(url || '', type || 'photo');
+        } else {
+          // Mock: Open media in new window
+          console.log('[Mock] Open Media Preview:', { url, type });
+          window.open(url, '_blank');
+        }
+      }
+
+      // Handle Read Text From Clipboard
+      if (e.name === 'web_app_read_text_from_clipboard') {
+        if (window.Android && window.Android.readTextFromClipboard) {
+          window.Android.readTextFromClipboard();
+        } else {
+          // Mock: Use browser Clipboard API
+          if (navigator.clipboard && navigator.clipboard.readText) {
+            navigator.clipboard.readText()
+              .then((text) => {
+                window.dispatchEvent(new CustomEvent('clipboard_text_received', {
+                  detail: { data: text }
+                }));
+              })
+              .catch(() => {
+                window.dispatchEvent(new CustomEvent('clipboard_text_received', {
+                  detail: { data: null, error: 'Clipboard access denied' }
+                }));
+              });
+          } else {
+            // Mock for fallback
+            window.dispatchEvent(new CustomEvent('clipboard_text_received', {
+              detail: { data: '[Mock Clipboard Text]' }
+            }));
+          }
+        }
+      }
+
+      // Handle Send Data (to bot)
+      if (e.name === 'web_app_data_send') {
+        const { data } = (e as any).params || {};
+        if (window.Android && window.Android.sendData) {
+          window.Android.sendData(data || '');
+        } else {
+          // Mock: Show what would be sent
+          console.log('[Mock] Send Data to Bot:', data);
+          alert(`[Mock] Đã gửi data tới Bot:\n${data}\n\n(Tính năng này chỉ hoạt động trong Telegram thật)`);
+        }
+      }
+
+      // Handle Switch Inline Query
+      if (e.name === 'web_app_switch_inline_query') {
+        const { query, chat_types } = (e as any).params || {};
+        if (window.Android && window.Android.switchInlineQuery) {
+          window.Android.switchInlineQuery(query || '', JSON.stringify(chat_types || []));
+        } else {
+          // Mock: Show inline query simulation
+          console.log('[Mock] Switch Inline Query:', { query, chat_types });
+          alert(`[Mock] Mở inline query:\nQuery: @bot ${query}\nChat Types: ${JSON.stringify(chat_types)}\n\n(Tính năng này chỉ hoạt động trong Telegram thật)`);
         }
       }
 
@@ -463,6 +815,35 @@ if (!await isTMA('complete')) {
           alert("setHeaderColor not implemented in native " + (window.Android ? "Android" : "mock"));
         }
       },
+      // Invoice support
+      openInvoice: (slug: string, callback?: (status: string) => void) => {
+        // Store callback for later use when invoice_closed event is received
+        if (callback) {
+          (window as any)._invoiceCallback = callback;
+        }
+        if (window.Android && window.Android.openInvoice) {
+          window.Android.openInvoice(slug);
+        } else {
+          alert(`[Mock Invoice] Opening invoice: ${slug}`);
+          // Simulate paid status after 2 seconds for browser testing
+          setTimeout(() => {
+            if ((window as any)._invoiceCallback) {
+              (window as any)._invoiceCallback('paid');
+            }
+          }, 2000);
+        }
+      },
+      // Fullscreen support
+      requestFullscreen: () => {
+        if (window.Android && window.Android.setFullscreen) {
+          window.Android.setFullscreen(true);
+        }
+      },
+      exitFullscreen: () => {
+        if (window.Android && window.Android.setFullscreen) {
+          window.Android.setFullscreen(false);
+        }
+      },
       // Minimal mocks to prevent crashes if other things are accessed
       onEvent: () => { },
       offEvent: () => { },
@@ -478,6 +859,27 @@ if (!await isTMA('complete')) {
   // Listen for Settings Button Pressed
   window.addEventListener('settings_button_pressed', () => {
     emitEvent('settings_button_pressed');
+  });
+
+  // Listen for Secondary Button Pressed
+  window.addEventListener('secondary_button_pressed', () => {
+    emitEvent('secondary_button_pressed');
+  });
+
+  // Listen for Main Button Pressed (from Android native button)
+  window.addEventListener('main_button_pressed', () => {
+    emitEvent('main_button_pressed');
+  });
+
+  // Listen for Invoice Closed from Android
+  window.addEventListener('invoice_closed', (e: any) => {
+    const detail = e.detail || {};
+    emitEvent('invoice_closed', { slug: detail.slug, status: detail.status });
+    // Call stored callback if available
+    if ((window as any)._invoiceCallback) {
+      (window as any)._invoiceCallback(detail.status);
+      (window as any)._invoiceCallback = null; // Clear callback after use
+    }
   });
 
   console.info(
