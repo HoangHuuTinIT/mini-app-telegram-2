@@ -2,7 +2,7 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue';
 import { routes } from '@/router';
-import { mainButton, useSignal, popup, hapticFeedback, miniApp, initData, settingsButton, closingBehavior, type User } from '@tma.js/sdk-vue';
+import { mainButton, useSignal, popup, hapticFeedback, miniApp, initData, settingsButton, closingBehavior, viewport, cloudStorage, type User } from '@tma.js/sdk-vue';
 import AppPage from '@/components/AppPage.vue';
 import AppLink from '@/components/AppLink.vue';
 import { useBackButton } from '@/composables/useBackButton';
@@ -116,6 +116,57 @@ const disableCloseConfirmation = () => {
   closingBehavior.disableConfirmation();
 };
 
+// Viewport state
+const viewportHeight = useSignal(viewport.height);
+const viewportIsExpanded = useSignal(viewport.isExpanded);
+
+const expandMiniApp = () => {
+  viewport.expand();
+};
+
+// Cloud Storage state and functions
+const cloudStorageKey = ref('testKey');
+const cloudStorageValue = ref('');
+const cloudStorageResult = ref('');
+const cloudStorageKeys = ref<string[]>([]);
+
+const saveToCloud = async () => {
+  try {
+    await cloudStorage.setItem(cloudStorageKey.value, cloudStorageValue.value);
+    cloudStorageResult.value = `✅ Đã lưu: ${cloudStorageKey.value} = ${cloudStorageValue.value}`;
+  } catch (e) {
+    cloudStorageResult.value = `❌ Lỗi: ${e}`;
+  }
+};
+
+const loadFromCloud = async () => {
+  try {
+    const value = await cloudStorage.getItem(cloudStorageKey.value);
+    cloudStorageResult.value = `📖 Đọc được: ${cloudStorageKey.value} = ${value || '(trống)'}`;
+  } catch (e) {
+    cloudStorageResult.value = `❌ Lỗi: ${e}`;
+  }
+};
+
+const deleteFromCloud = async () => {
+  try {
+    await cloudStorage.deleteItem(cloudStorageKey.value);
+    cloudStorageResult.value = `🗑️ Đã xóa: ${cloudStorageKey.value}`;
+  } catch (e) {
+    cloudStorageResult.value = `❌ Lỗi: ${e}`;
+  }
+};
+
+const getAllKeys = async () => {
+  try {
+    const keys = await cloudStorage.getKeys();
+    cloudStorageKeys.value = keys;
+    cloudStorageResult.value = `🔑 Có ${keys.length} keys: ${keys.join(', ') || '(không có)'}`;
+  } catch (e) {
+    cloudStorageResult.value = `❌ Lỗi: ${e}`;
+  }
+};
+
 const showPopup = async () => {
   try {
     const buttonId = await (popup as any).show({
@@ -226,6 +277,36 @@ const changeHeaderColor = (color: string) => {
         <button @click="disableCloseConfirmation">🔓 Tắt Xác nhận đóng</button>
       </div>
     </div>
+
+    <!-- Viewport Demo -->
+    <div class="native-controls">
+      <h3>📐 Viewport</h3>
+      <div class="viewport-info">
+        <p>Height: <strong>{{ viewportHeight }}px</strong></p>
+        <p>Expanded: <strong>{{ viewportIsExpanded ? '✅ Yes' : '❌ No' }}</strong></p>
+      </div>
+      <div class="button-group">
+        <button @click="expandMiniApp">🔲 Expand Full Screen</button>
+      </div>
+    </div>
+
+    <!-- Cloud Storage Demo -->
+    <div class="native-controls">
+      <h3>☁️ Cloud Storage</h3>
+      <div class="storage-inputs">
+        <input v-model="cloudStorageKey" placeholder="Key" class="storage-input" />
+        <input v-model="cloudStorageValue" placeholder="Value" class="storage-input" />
+      </div>
+      <div class="button-group">
+        <button @click="saveToCloud">💾 Lưu</button>
+        <button @click="loadFromCloud">📖 Đọc</button>
+        <button @click="deleteFromCloud">🗑️ Xóa</button>
+        <button @click="getAllKeys">🔑 Lấy Keys</button>
+      </div>
+      <div v-if="cloudStorageResult" class="storage-result">
+        {{ cloudStorageResult }}
+      </div>
+    </div>
   </AppPage>
 </template>
 
@@ -260,6 +341,41 @@ button:active {
 
 .btn-danger {
   background: var(--tg-theme-destructive-text-color, #ff3b30);
+}
+
+.viewport-info {
+  margin-bottom: 10px;
+  padding: 10px;
+  background: var(--tg-theme-bg-color, #ffffff);
+  border-radius: 8px;
+}
+
+.viewport-info p {
+  margin: 5px 0;
+}
+
+.storage-inputs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.storage-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--tg-theme-hint-color, #ccc);
+  border-radius: 8px;
+  background: var(--tg-theme-bg-color, #ffffff);
+  color: var(--tg-theme-text-color, #000000);
+  font-size: 14px;
+}
+
+.storage-result {
+  margin-top: 10px;
+  padding: 10px;
+  background: var(--tg-theme-bg-color, #ffffff);
+  border-radius: 8px;
+  font-family: monospace;
 }
 
 .index-page__links {

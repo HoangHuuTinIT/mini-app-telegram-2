@@ -55,6 +55,20 @@ if (!await isTMA('complete')) {
         return emitEvent('safe_area_changed', noInsets);
       }
 
+      // Handle Viewport Expand
+      if (e.name === 'web_app_expand') {
+        if (window.Android && window.Android.expandViewport) {
+          window.Android.expandViewport();
+        }
+        // Emit viewport changed with expanded state
+        return emitEvent('viewport_changed', {
+          height: window.innerHeight,
+          width: window.innerWidth,
+          is_expanded: true,
+          is_state_stable: true,
+        });
+      }
+
       // Handle Main Button setup
       if (e.name === 'web_app_setup_main_button') {
         const { is_visible, text, color, is_active, is_progress_visible } = (e as any).is_visible !== undefined ? e as any : (e as any).params || {};
@@ -202,6 +216,77 @@ if (!await isTMA('complete')) {
           // setTimeout(() => window.onAndroidQrScanned("https://t.me/example"), 2000);
         }
       }
+
+      // Handle Cloud Storage operations
+      if (e.name === 'web_app_invoke_custom_method') {
+        const params = (e as any).params || {};
+        const { method, req_id } = params;
+
+        if (method === 'saveStorageValue') {
+          const { key, value } = params.params || {};
+          if (window.Android && window.Android.cloudStorageSetItem) {
+            window.Android.cloudStorageSetItem(key, value);
+          } else {
+            // Fallback to localStorage for browser testing
+            localStorage.setItem(`tg_cloud_${key}`, value);
+          }
+          emitEvent('custom_method_invoked', { req_id, result: true });
+        }
+
+        if (method === 'getStorageValues') {
+          const { keys } = params.params || {};
+          const result: Record<string, string> = {};
+
+          if (window.Android && window.Android.cloudStorageGetItem) {
+            for (const key of keys) {
+              const value = window.Android.cloudStorageGetItem(key);
+              if (value) result[key] = value;
+            }
+          } else {
+            // Fallback to localStorage
+            for (const key of keys) {
+              const value = localStorage.getItem(`tg_cloud_${key}`);
+              if (value) result[key] = value;
+            }
+          }
+          emitEvent('custom_method_invoked', { req_id, result });
+        }
+
+        if (method === 'deleteStorageValues') {
+          const { keys } = params.params || {};
+          if (window.Android && window.Android.cloudStorageRemoveItem) {
+            for (const key of keys) {
+              window.Android.cloudStorageRemoveItem(key);
+            }
+          } else {
+            // Fallback to localStorage
+            for (const key of keys) {
+              localStorage.removeItem(`tg_cloud_${key}`);
+            }
+          }
+          emitEvent('custom_method_invoked', { req_id, result: true });
+        }
+
+        if (method === 'getStorageKeys') {
+          let keys: string[] = [];
+          if (window.Android && window.Android.cloudStorageGetKeys) {
+            try {
+              keys = JSON.parse(window.Android.cloudStorageGetKeys());
+            } catch {
+              keys = [];
+            }
+          } else {
+            // Fallback to localStorage
+            for (let i = 0; i < localStorage.length; i++) {
+              const key = localStorage.key(i);
+              if (key?.startsWith('tg_cloud_')) {
+                keys.push(key.replace('tg_cloud_', ''));
+              }
+            }
+          }
+          emitEvent('custom_method_invoked', { req_id, result: keys });
+        }
+      }
     },
     launchParams: new URLSearchParams([
       // Discover more launch parameters:
@@ -273,6 +358,16 @@ if (!await isTMA('complete')) {
     // alert('DEBUG: Requesting initial theme from Android...');
     window.Android.requestTheme();
   }
+
+  // Listen for Viewport Expanded from Android
+  (window as any).onViewportExpanded = (height: number, width: number) => {
+    emitEvent('viewport_changed', {
+      height: height,
+      width: width,
+      is_expanded: true,
+      is_state_stable: true,
+    });
+  };
 
   // --- POLYFILL for window.Telegram.WebApp ---
   // This allows direct usage of Telegram globals (bypassing the SDK wrapper)
