@@ -1078,6 +1078,7 @@ const changeHeaderColor = (color: string) => {
 
     <div v-if="isAndroidHost" class="native-controls">
       <h3>🤖 Android Native Controls</h3>
+      <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Các chức năng native: Toast, Haptic Feedback (rung), Quét QR, Đổi màu Header, và đóng App</p>
       <div class="button-group">
         <button @click="showNativeToast">Toast "Hello"</button>
         <button @click="() => triggerImpact('light')">Rung Nhẹ</button>
@@ -1098,6 +1099,7 @@ const changeHeaderColor = (color: string) => {
     <!-- Secondary Button Demo -->
     <div class="native-controls">
         <h3>🥈 Secondary Button</h3>
+        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Nút hành động thứ hai, thường đặt cạnh Main Button để cung cấp thêm lựa chọn</p>
         <div class="button-group">
             <button @click="toggleSecondaryButton">
                 {{ isSecondaryButtonVisible ? 'Ẩn' : 'Hiện' }} Nút Phụ
@@ -1108,6 +1110,7 @@ const changeHeaderColor = (color: string) => {
     <!-- Swipe Behavior Demo -->
     <div class="native-controls">
         <h3>👆 Swipe Behavior</h3>
+        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Kiểm soát việc vuốt dọc để đóng Mini App (chặn khi đang nhập form, thanh toán...)</p>
         <label style="display: flex; align-items: center; gap: 10px;">
             <input type="checkbox" v-model="allowVerticalSwipe" @change="toggleSwipe" />
             Cho phép vuốt dọc để đóng
@@ -1117,6 +1120,7 @@ const changeHeaderColor = (color: string) => {
     <!-- Invoice Demo -->
     <div class="native-controls">
         <h3>💰 Invoice (Fake)</h3>
+        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Mở Invoice thanh toán qua Telegram Payments (Stars). Trong demo này là mock.</p>
         <div class="storage-inputs">
             <input v-model="invoiceSlug" placeholder="Invoice Slug" class="storage-input" />
         </div>
@@ -1131,6 +1135,7 @@ const changeHeaderColor = (color: string) => {
     <!-- Fullscreen Demo -->
     <div class="native-controls">
         <h3>🖥️ Fullscreen</h3>
+        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Ẩn status bar và toolbar để Mini App chiếm toàn bộ màn hình (cho game, video...)</p>
         <div class="button-group">
             <button @click="requestFullscreen">Vào Fullscreen</button>
             <button @click="exitFullscreen">Thoát Fullscreen</button>
@@ -1140,6 +1145,7 @@ const changeHeaderColor = (color: string) => {
     <!-- Share Demo -->
     <div class="native-controls">
         <h3>📢 Share Message</h3>
+        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Mở hộp thoại chia sẻ native của hệ thống để gửi link/tin nhắn</p>
         <div class="storage-inputs">
             <input v-model="shareText" placeholder="Tin nhắn muốn share" class="storage-input" />
         </div>
@@ -1399,6 +1405,7 @@ const changeHeaderColor = (color: string) => {
     <!-- Main Button Demo -->
     <div class="native-controls">
       <h3>🚀 Main Button</h3>
+      <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Nút hành động chính hiển thị ở cuối màn hình (VD: Thanh toán, Gửi, Xác nhận...)</p>
       <div class="button-group">
         <button @click="toggleMainButton">
           {{ isMainButtonVisible ? 'Ẩn' : 'Hiện' }} Nút Chính
@@ -1415,6 +1422,7 @@ const changeHeaderColor = (color: string) => {
     <!-- Popup Demo -->
     <div class="native-controls">
       <h3>💬 Popup Demo</h3>
+      <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Hộp thoại xác nhận với các nút tùy chọn (OK/Cancel/Destructive)</p>
       <div class="button-group">
         <button @click="showPopup">Hiện Popup Chuẩn</button>
       </div>
@@ -1423,6 +1431,7 @@ const changeHeaderColor = (color: string) => {
     <!-- Closing Behavior Demo -->
     <div class="native-controls">
       <h3>🚪 Closing Behavior</h3>
+      <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Bật/tắt xác nhận trước khi đóng Mini App (để tránh mất dữ liệu)</p>
       <div class="button-group">
         <button @click="enableCloseConfirmation">🔒 Bật Xác nhận đóng</button>
         <button @click="disableCloseConfirmation">🔓 Tắt Xác nhận đóng</button>
@@ -1432,6 +1441,7 @@ const changeHeaderColor = (color: string) => {
     <!-- Viewport Demo -->
     <div class="native-controls">
       <h3>📐 Viewport</h3>
+      <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Mở rộng viewport để Mini App chiếm toàn bộ màn hình có thể</p>
       <div class="viewport-info">
         <p>Height: <strong>{{ viewportHeight }}px</strong></p>
         <p>Expanded: <strong>{{ viewportIsExpanded ? '✅ Yes' : '❌ No' }}</strong></p>
@@ -1444,6 +1454,7 @@ const changeHeaderColor = (color: string) => {
     <!-- Cloud Storage Demo -->
     <div class="native-controls">
       <h3>☁️ Cloud Storage</h3>
+      <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Lưu dữ liệu key-value lên cloud Telegram, tự động đồng bộ giữa các thiết bị</p>
       <div class="storage-inputs">
         <input v-model="cloudStorageKey" placeholder="Key" class="storage-input" />
         <input v-model="cloudStorageValue" placeholder="Value" class="storage-input" />
@@ -1462,6 +1473,7 @@ const changeHeaderColor = (color: string) => {
     <!-- Biometric Demo -->
     <div class="native-controls">
       <h3>🔐 Biometric Authentication</h3>
+      <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Xác thực bằng vân tay hoặc FaceID để bảo vệ dữ liệu nhạy cảm</p>
       <div class="button-group">
         <button @click="checkBiometric">🔍 Kiểm tra</button>
         <button @click="authenticateBiometric">👆 Xác thực</button>
