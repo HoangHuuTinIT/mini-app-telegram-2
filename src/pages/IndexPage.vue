@@ -62,6 +62,14 @@ const updateMainButtonColor = () => {
   mainButton.setBgColor("#ff4081"); // Pink color
 };
 
+const enableMainButton = () => {
+  mainButton.enable();
+};
+
+const disableMainButton = () => {
+  mainButton.disable();
+};
+
 const showNativeToast = () => {
   if (window.Android) {
     window.Android.showToast("Lời chào từ Vue.js gửi tới Android!");
@@ -179,6 +187,8 @@ const changeHeaderColor = (color: string) => {
         </button>
         <button @click="updateMainButtonText">Đổi tên "Thanh Toán"</button>
         <button @click="updateMainButtonColor">Đổi màu Hồng</button>
+        <button @click="enableMainButton">✅ Enable</button>
+        <button @click="disableMainButton">🚫 Disable</button>
       </div>
     </div>
 

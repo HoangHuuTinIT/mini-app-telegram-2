@@ -57,7 +57,7 @@ if (!await isTMA('complete')) {
 
       // Handle Main Button setup
       if (e.name === 'web_app_setup_main_button') {
-        const { is_visible, text, color } = (e as any).is_visible !== undefined ? e as any : (e as any).params || {};
+        const { is_visible, text, color, is_active } = (e as any).is_visible !== undefined ? e as any : (e as any).params || {};
 
         // Forward to Android if available
         if (window.Android) {
@@ -70,10 +70,16 @@ if (!await isTMA('complete')) {
           if (color) {
             window.Android.setMainButtonColor(color);
           }
+          if (typeof is_active === 'boolean') {
+            window.Android.setMainButtonEnabled(is_active);
+          }
         }
         // Also emit event back to SDK to confirm the change (mocking the behavior)
         if (typeof is_visible === 'boolean') {
           emitEvent('main_button_settings_changed', { is_visible });
+        }
+        if (typeof is_active === 'boolean') {
+          emitEvent('main_button_settings_changed', { is_active });
         }
       }
 

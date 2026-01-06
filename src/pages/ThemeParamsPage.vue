@@ -15,7 +15,7 @@ const rows = computed<DisplayDataRow[]>(() => Object
 <template>
   <AppPage title="Theme Params">
     <template #disclaimer>
-      This page displays current
+      Thay đổi chế độ sáng tối của máy sẽ thay đổi mã màu
       <AppLink to="https://docs.telegram-mini-apps.com/platform/theming">theme params
       </AppLink>
       .

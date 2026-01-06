@@ -50,6 +50,8 @@ function getUserRows(user: User): DisplayDataRow[] {
 <template>
   <AppPage title="Init Data">
     <template #disclaimer>
+      fix cứng dữ liệu gửi qua bao gồm first_name, id và username
+      <br/><br/>
       This page displays application
       <AppLink to="https://docs.telegram-mini-apps.com/platform/init-data">init data</AppLink>
       .
