@@ -33,6 +33,9 @@ if (!await isTMA('complete')) {
   } as const;
   const noInsets = { left: 0, top: 0, bottom: 0, right: 0 } as const;
 
+  // Track viewport expanded state - starts as false
+  let isViewportExpanded = false;
+
   mockTelegramEnv({
     onEvent(e) {
       // Here you can write your own handlers for all known Telegram Mini Apps methods:
@@ -44,7 +47,7 @@ if (!await isTMA('complete')) {
         return emitEvent('viewport_changed', {
           height: window.innerHeight,
           width: window.innerWidth,
-          is_expanded: true,
+          is_expanded: isViewportExpanded,  // Use tracked state instead of always true
           is_state_stable: true,
         });
       }
@@ -57,6 +60,9 @@ if (!await isTMA('complete')) {
 
       // Handle Viewport Expand
       if (e.name === 'web_app_expand') {
+        // Mark as expanded
+        isViewportExpanded = true;
+
         if (window.Android && window.Android.expandViewport) {
           window.Android.expandViewport();
         }
@@ -71,7 +77,12 @@ if (!await isTMA('complete')) {
 
       // Handle Main Button setup
       if (e.name === 'web_app_setup_main_button') {
-        const { is_visible, text, color, is_active, is_progress_visible } = (e as any).is_visible !== undefined ? e as any : (e as any).params || {};
+        // SDK may send params directly on e, or wrapped in e.params - merge both
+        const directParams = e as any;
+        const nestedParams = (e as any).params || {};
+        const mergedParams = { ...nestedParams, ...directParams };
+
+        const { is_visible, text, color, is_active, is_progress_visible } = mergedParams;
 
         // Forward to Android if available
         if (window.Android) {

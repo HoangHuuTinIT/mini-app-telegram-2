@@ -76,10 +76,18 @@ const updateMainButtonColor = () => {
 
 const enableMainButton = () => {
   mainButton.enable();
+  // Also call Android directly to ensure it works
+  if (window.Android && window.Android.setMainButtonEnabled) {
+    window.Android.setMainButtonEnabled(true);
+  }
 };
 
 const disableMainButton = () => {
   mainButton.disable();
+  // Also call Android directly to ensure it works
+  if (window.Android && window.Android.setMainButtonEnabled) {
+    window.Android.setMainButtonEnabled(false);
+  }
 };
 
 const showProgress = () => {
