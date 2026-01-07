@@ -1076,27 +1076,28 @@ const changeHeaderColor = (color: string) => {
       </li>
     </ul>
 
-    <div v-if="isAndroidHost" class="native-controls">
-      <h3>🤖 Android Native Controls</h3>
-      <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Các chức năng native: Toast, Haptic Feedback (rung), Quét QR, Đổi màu Header, và đóng App</p>
+    <!-- ========================================== -->
+    <!-- 1. BUTTONS - Các nút bấm -->
+    <!-- ========================================== -->
+
+    <!-- 1.1 Main Button Demo -->
+    <div class="native-controls">
+      <h3>🚀 Main Button</h3>
+      <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Nút hành động chính hiển thị ở cuối màn hình (VD: Thanh toán, Gửi, Xác nhận...)</p>
       <div class="button-group">
-        <button @click="showNativeToast">Toast "Hello"</button>
-        <button @click="() => triggerImpact('light')">Rung Nhẹ</button>
-        <button @click="() => triggerImpact('heavy')">Rung Mạnh</button>
-        <button @click="() => triggerNotification('success')">Rung Success</button>
-        <button @click="() => triggerNotification('error')">Rung Error</button>
-        <button @click="triggerSelection">Rung Selection</button>
-        <button @click="scanQr">📷 Quét QRCode</button>
-        <div class="test-row">
-           <button @click="() => changeHeaderColor('#ff0000')">Header Đỏ</button>
-           <button @click="() => changeHeaderColor('#008000')">Header Xanh</button>
-           <button @click="() => changeHeaderColor('secondary_bg_color')">Header Theme</button>
-        </div>
-        <button @click="closeNativeApp" class="btn-danger">Đóng App</button>
+        <button @click="toggleMainButton">
+          {{ isMainButtonVisible ? 'Ẩn' : 'Hiện' }} Nút Chính
+        </button>
+        <button @click="updateMainButtonText">Đổi tên "Thanh Toán"</button>
+        <button @click="updateMainButtonColor">Đổi màu Hồng</button>
+        <button @click="enableMainButton">✅ Enable</button>
+        <button @click="disableMainButton">🚫 Disable</button>
+        <button @click="showProgress">⏳ Loading</button>
+        <button @click="hideProgress">✓ Done</button>
       </div>
     </div>
 
-    <!-- Secondary Button Demo -->
+    <!-- 1.2 Secondary Button Demo -->
     <div class="native-controls">
         <h3>🥈 Secondary Button</h3>
         <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Nút hành động thứ hai, thường đặt cạnh Main Button để cung cấp thêm lựa chọn</p>
@@ -1107,78 +1108,22 @@ const changeHeaderColor = (color: string) => {
         </div>
     </div>
 
-    <!-- Swipe Behavior Demo -->
-    <div class="native-controls">
-        <h3>👆 Swipe Behavior</h3>
-        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Kiểm soát việc vuốt dọc để đóng Mini App (chặn khi đang nhập form, thanh toán...)</p>
-        <label style="display: flex; align-items: center; gap: 10px;">
-            <input type="checkbox" v-model="allowVerticalSwipe" @change="toggleSwipe" />
-            Cho phép vuốt dọc để đóng
-        </label>
+    <!-- ========================================== -->
+    <!-- 2. UI CONTROL - Điều khiển giao diện -->
+    <!-- ========================================== -->
+
+    <!-- 2.1 Header Color (trong Android Native Controls) -->
+    <div v-if="isAndroidHost" class="native-controls">
+      <h3>🎨 Header Color</h3>
+      <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Đổi màu toolbar và status bar của Android</p>
+      <div class="button-group">
+        <button @click="() => changeHeaderColor('#ff0000')">Header Đỏ</button>
+        <button @click="() => changeHeaderColor('#008000')">Header Xanh</button>
+        <button @click="() => changeHeaderColor('secondary_bg_color')">Header Theme</button>
+      </div>
     </div>
 
-    <!-- Invoice Demo -->
-    <div class="native-controls">
-        <h3>💰 Invoice (Fake)</h3>
-        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Mở Invoice thanh toán qua Telegram Payments (Stars). Trong demo này là mock.</p>
-        <div class="storage-inputs">
-            <input v-model="invoiceSlug" placeholder="Invoice Slug" class="storage-input" />
-        </div>
-        <div class="button-group">
-            <button @click="openInvoice">Mở Invoice</button>
-        </div>
-        <div v-if="invoiceResult" class="storage-result">
-            {{ invoiceResult }}
-        </div>
-    </div>
-
-    <!-- Fullscreen Demo -->
-    <div class="native-controls">
-        <h3>🖥️ Fullscreen</h3>
-        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Ẩn status bar và toolbar để Mini App chiếm toàn bộ màn hình (cho game, video...)</p>
-        <div class="button-group">
-            <button @click="requestFullscreen">Vào Fullscreen</button>
-            <button @click="exitFullscreen">Thoát Fullscreen</button>
-        </div>
-    </div>
-
-    <!-- Share Demo -->
-    <div class="native-controls">
-        <h3>📢 Share Message</h3>
-        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Mở hộp thoại chia sẻ native của hệ thống để gửi link/tin nhắn</p>
-        <div class="storage-inputs">
-            <input v-model="shareText" placeholder="Tin nhắn muốn share" class="storage-input" />
-        </div>
-        <div class="button-group">
-            <button @click="shareApp">Share App</button>
-        </div>
-    </div>
-
-    <!-- Request Write Access Demo -->
-    <div class="native-controls">
-        <h3>✍️ Request Write Access</h3>
-        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Yêu cầu quyền để Bot gửi tin nhắn cho user</p>
-        <div class="button-group">
-            <button @click="requestWriteAccess">Yêu cầu quyền gửi tin</button>
-        </div>
-        <div v-if="writeAccessResult" class="storage-result">
-            {{ writeAccessResult }}
-        </div>
-    </div>
-
-    <!-- Request Contact Demo -->
-    <div class="native-controls">
-        <h3>📞 Request Contact</h3>
-        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Yêu cầu user chia sẻ số điện thoại</p>
-        <div class="button-group">
-            <button @click="requestContact">Yêu cầu số điện thoại</button>
-        </div>
-        <div v-if="contactResult" class="storage-result">
-            {{ contactResult }}
-        </div>
-    </div>
-
-    <!-- Bottom Bar Color Demo -->
+    <!-- 2.2 Bottom Bar Color Demo -->
     <div class="native-controls">
         <h3>🎨 Bottom Bar Color</h3>
         <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Đổi màu thanh bottom bar (navigation bar)</p>
@@ -1193,100 +1138,117 @@ const changeHeaderColor = (color: string) => {
         </div>
     </div>
 
-    <!-- Emoji Status Demo -->
+    <!-- 2.3 Viewport Demo (Expand Viewport) -->
     <div class="native-controls">
-        <h3>😀 Emoji Status</h3>
-        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Đặt emoji status cho user (yêu cầu Telegram Premium)</p>
+      <h3>📐 Viewport</h3>
+      <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Mở rộng viewport để Mini App chiếm toàn bộ màn hình có thể</p>
+      <div class="viewport-info">
+        <p>Height: <strong>{{ viewportHeight }}px</strong></p>
+        <p>Expanded: <strong>{{ viewportIsExpanded ? '✅ Yes' : '❌ No' }}</strong></p>
+      </div>
+      <div class="button-group">
+        <button @click="expandMiniApp">🔲 Expand Full Screen</button>
+      </div>
+    </div>
+
+    <!-- 2.4 Fullscreen Demo -->
+    <div class="native-controls">
+        <h3>🖥️ Fullscreen</h3>
+        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Ẩn status bar và toolbar để Mini App chiếm toàn bộ màn hình (cho game, video...)</p>
+        <div class="button-group">
+            <button @click="requestFullscreen">Vào Fullscreen</button>
+            <button @click="exitFullscreen">Thoát Fullscreen</button>
+        </div>
+    </div>
+
+    <!-- 2.5 Swipe Behavior Demo -->
+    <div class="native-controls">
+        <h3>👆 Swipe Behavior</h3>
+        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Kiểm soát việc vuốt dọc để đóng Mini App (chặn khi đang nhập form, thanh toán...)</p>
+        <label style="display: flex; align-items: center; gap: 10px;">
+            <input type="checkbox" v-model="allowVerticalSwipe" @change="toggleSwipe" />
+            Cho phép vuốt dọc để đóng
+        </label>
+    </div>
+
+    <!-- 2.6 Closing Behavior Demo -->
+    <div class="native-controls">
+      <h3>🚪 Closing Behavior</h3>
+      <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Bật/tắt xác nhận trước khi đóng Mini App (để tránh mất dữ liệu)</p>
+      <div class="button-group">
+        <button @click="enableCloseConfirmation">🔒 Bật Xác nhận đóng</button>
+        <button @click="disableCloseConfirmation">🔓 Tắt Xác nhận đóng</button>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 3. FEEDBACK - Phản hồi người dùng -->
+    <!-- ========================================== -->
+
+    <!-- 3.1 Haptic Feedback + Toast + QR Scanner + Close App -->
+    <div v-if="isAndroidHost" class="native-controls">
+      <h3>📳 Haptic Feedback & Toast</h3>
+      <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Rung phản hồi với các kiểu và cường độ khác nhau, hiển thị Toast</p>
+      <div class="button-group">
+        <button @click="showNativeToast">Toast "Hello"</button>
+        <button @click="() => triggerImpact('light')">Rung Nhẹ</button>
+        <button @click="() => triggerImpact('heavy')">Rung Mạnh</button>
+        <button @click="() => triggerNotification('success')">Rung Success</button>
+        <button @click="() => triggerNotification('error')">Rung Error</button>
+        <button @click="triggerSelection">Rung Selection</button>
+      </div>
+    </div>
+
+    <!-- 3.2 Popup Demo -->
+    <div class="native-controls">
+      <h3>💬 Popup Demo</h3>
+      <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Hộp thoại xác nhận với các nút tùy chọn (OK/Cancel/Destructive)</p>
+      <div class="button-group">
+        <button @click="showPopup">Hiện Popup Chuẩn</button>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 4. ACTIONS - Hành động -->
+    <!-- ========================================== -->
+
+    <!-- 4.2 QR Scanner -->
+    <div v-if="isAndroidHost" class="native-controls">
+      <h3>📷 QR Scanner</h3>
+      <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Mở camera để quét mã QR</p>
+      <div class="button-group">
+        <button @click="scanQr">📷 Quét QRCode</button>
+      </div>
+    </div>
+
+    <!-- 4.3 Invoice Demo -->
+    <div class="native-controls">
+        <h3>💰 Invoice (Fake)</h3>
+        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Mở Invoice thanh toán qua Telegram Payments (Stars). Trong demo này là mock.</p>
         <div class="storage-inputs">
-            <input v-model="emojiId" placeholder="Custom Emoji ID" class="storage-input" />
+            <input v-model="invoiceSlug" placeholder="Invoice Slug" class="storage-input" />
         </div>
         <div class="button-group">
-            <button @click="setEmojiStatus">Đặt Emoji Status</button>
+            <button @click="openInvoice">Mở Invoice</button>
         </div>
-        <div v-if="emojiStatusResult" class="storage-result">
-            {{ emojiStatusResult }}
+        <div v-if="invoiceResult" class="storage-result">
+            {{ invoiceResult }}
         </div>
     </div>
 
-    <!-- Home Screen Demo -->
+    <!-- 4.4 Share Text Demo -->
     <div class="native-controls">
-        <h3>🏠 Add to Home Screen</h3>
-        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Thêm Mini App vào màn hình chính</p>
-        <div class="button-group">
-            <button @click="addToHomeScreen">➕ Thêm vào Home Screen</button>
+        <h3>📢 Share Message</h3>
+        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Mở hộp thoại chia sẻ native của hệ thống để gửi link/tin nhắn</p>
+        <div class="storage-inputs">
+            <input v-model="shareText" placeholder="Tin nhắn muốn share" class="storage-input" />
         </div>
-        <div v-if="homeScreenResult" class="storage-result">
-            {{ homeScreenResult }}
+        <div class="button-group">
+            <button @click="shareApp">Share App</button>
         </div>
     </div>
 
-    <!-- Accelerometer Demo -->
-    <div class="native-controls">
-        <h3>📱 Accelerometer</h3>
-        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Đọc dữ liệu cảm biến gia tốc</p>
-        <div class="button-group">
-            <button @click="startAccelerometer" :disabled="isAccelerometerActive">▶️ Start</button>
-            <button @click="stopAccelerometer" :disabled="!isAccelerometerActive">⏹️ Stop</button>
-        </div>
-        <div class="storage-result" style="font-family: monospace;">
-            X: {{ accelerometerData.x.toFixed(3) }}<br/>
-            Y: {{ accelerometerData.y.toFixed(3) }}<br/>
-            Z: {{ accelerometerData.z.toFixed(3) }}
-        </div>
-    </div>
-
-    <!-- Gyroscope Demo -->
-    <div class="native-controls">
-        <h3>🌀 Gyroscope</h3>
-        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Đọc dữ liệu cảm biến con quay hồi chuyển</p>
-        <div class="button-group">
-            <button @click="startGyroscope" :disabled="isGyroscopeActive">▶️ Start</button>
-            <button @click="stopGyroscope" :disabled="!isGyroscopeActive">⏹️ Stop</button>
-        </div>
-        <div class="storage-result" style="font-family: monospace;">
-            X (Beta): {{ gyroscopeData.x.toFixed(3) }}<br/>
-            Y (Gamma): {{ gyroscopeData.y.toFixed(3) }}<br/>
-            Z (Alpha): {{ gyroscopeData.z.toFixed(3) }}
-        </div>
-    </div>
-
-    <!-- Device Orientation Demo -->
-    <div class="native-controls">
-        <h3>🧭 Device Orientation</h3>
-        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Đọc hướng thiết bị (la bàn số)</p>
-        <div class="button-group">
-            <button @click="startDeviceOrientation" :disabled="isDeviceOrientationActive">▶️ Start</button>
-            <button @click="stopDeviceOrientation" :disabled="!isDeviceOrientationActive">⏹️ Stop</button>
-        </div>
-        <div class="storage-result" style="font-family: monospace;">
-            Alpha (Hướng): {{ deviceOrientationData.alpha.toFixed(1) }}°<br/>
-            Beta (Nghiêng trước/sau): {{ deviceOrientationData.beta.toFixed(1) }}°<br/>
-            Gamma (Nghiêng trái/phải): {{ deviceOrientationData.gamma.toFixed(1) }}°<br/>
-            Absolute: {{ deviceOrientationData.absolute ? 'Có' : 'Không' }}
-        </div>
-    </div>
-
-    <!-- Location Manager Demo -->
-    <div class="native-controls">
-        <h3>📍 Location Manager</h3>
-        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Lấy vị trí GPS hiện tại</p>
-        <div class="button-group">
-            <button @click="openLocationSettings">⚙️ Cài đặt</button>
-            <button @click="getCurrentLocation" :disabled="isLoadingLocation">
-                {{ isLoadingLocation ? '⏳ Đang lấy...' : '📍 Lấy vị trí' }}
-            </button>
-        </div>
-        <div class="storage-result" style="font-family: monospace;">
-            <template v-if="locationError">{{ locationError }}</template>
-            <template v-else>
-                Latitude: {{ locationData.latitude.toFixed(6) }}<br/>
-                Longitude: {{ locationData.longitude.toFixed(6) }}<br/>
-                Độ chính xác: {{ locationData.accuracy.toFixed(0) }}m
-            </template>
-        </div>
-    </div>
-
-    <!-- Story Widget Demo -->
+    <!-- 4.5 Story Widget Demo -->
     <div class="native-controls">
         <h3>📖 Story Widget</h3>
         <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Chia sẻ nội dung lên Telegram Stories</p>
@@ -1306,7 +1268,7 @@ const changeHeaderColor = (color: string) => {
         </div>
     </div>
 
-    <!-- Download File Demo -->
+    <!-- 4.6 Download File Demo -->
     <div class="native-controls">
         <h3>📥 Download File</h3>
         <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Tải file từ URL về thiết bị</p>
@@ -1324,7 +1286,7 @@ const changeHeaderColor = (color: string) => {
         </div>
     </div>
 
-    <!-- Media Preview Demo -->
+    <!-- 4.7 Media Preview Demo -->
     <div class="native-controls">
         <h3>🖼️ Media Preview</h3>
         <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Xem trước ảnh/video trong viewer toàn màn hình</p>
@@ -1340,21 +1302,16 @@ const changeHeaderColor = (color: string) => {
         </div>
     </div>
 
-    <!-- Read Clipboard Demo -->
-    <div class="native-controls">
-        <h3>📋 Read Clipboard</h3>
-        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Đọc nội dung text từ clipboard</p>
-        <div class="button-group">
-            <button @click="readTextFromClipboard" :disabled="isReadingClipboard">
-                {{ isReadingClipboard ? '⏳ Đang đọc...' : '📋 Đọc Clipboard' }}
-            </button>
-        </div>
-        <div v-if="clipboardText" class="storage-result">
-            {{ clipboardText }}
-        </div>
+    <!-- 4.8 Close App -->
+    <div v-if="isAndroidHost" class="native-controls">
+      <h3>🚪 Close App</h3>
+      <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Đóng Mini App Activity</p>
+      <div class="button-group">
+        <button @click="closeNativeApp" class="btn-danger">Đóng App</button>
+      </div>
     </div>
 
-    <!-- Send Data Demo -->
+    <!-- 4.9 Send Data Demo -->
     <div class="native-controls">
         <h3>📤 Send Data (to Bot)</h3>
         <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Gửi dữ liệu trực tiếp tới Bot qua Telegram</p>
@@ -1369,7 +1326,7 @@ const changeHeaderColor = (color: string) => {
         </div>
     </div>
 
-    <!-- Switch Inline Query Demo -->
+    <!-- 4.10 Switch Inline Query Demo -->
     <div class="native-controls">
         <h3>🔍 Switch Inline Query</h3>
         <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Mở inline query @bot trong chat khác</p>
@@ -1390,68 +1347,53 @@ const changeHeaderColor = (color: string) => {
         </div>
     </div>
 
-    <!-- Start Param Demo -->
+    <!-- ========================================== -->
+    <!-- 5. PERMISSIONS - Quyền truy cập -->
+    <!-- ========================================== -->
+
+    <!-- 5.1 Request Write Access Demo -->
     <div class="native-controls">
-        <h3>🚀 Start Param</h3>
-        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Tham số khởi động từ deep link (t.me/bot?startapp=xxx)</p>
-        <div class="storage-result" style="font-family: monospace;">
-            {{ startParam ? `Start Param: ${startParam}` : '(Không có start param)' }}
+        <h3>✍️ Request Write Access</h3>
+        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Yêu cầu quyền để Bot gửi tin nhắn cho user</p>
+        <div class="button-group">
+            <button @click="requestWriteAccess">Yêu cầu quyền gửi tin</button>
         </div>
-        <p style="font-size: 11px; color: var(--tg-theme-hint-color); margin-top: 8px;">
-            Test bằng cách thêm <code>?tgWebAppStartParam=test123</code> vào URL
-        </p>
+        <div v-if="writeAccessResult" class="storage-result">
+            {{ writeAccessResult }}
+        </div>
     </div>
 
-    <!-- Main Button Demo -->
+    <!-- 5.2 Request Contact Demo -->
     <div class="native-controls">
-      <h3>🚀 Main Button</h3>
-      <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Nút hành động chính hiển thị ở cuối màn hình (VD: Thanh toán, Gửi, Xác nhận...)</p>
-      <div class="button-group">
-        <button @click="toggleMainButton">
-          {{ isMainButtonVisible ? 'Ẩn' : 'Hiện' }} Nút Chính
-        </button>
-        <button @click="updateMainButtonText">Đổi tên "Thanh Toán"</button>
-        <button @click="updateMainButtonColor">Đổi màu Hồng</button>
-        <button @click="enableMainButton">✅ Enable</button>
-        <button @click="disableMainButton">🚫 Disable</button>
-        <button @click="showProgress">⏳ Loading</button>
-        <button @click="hideProgress">✓ Done</button>
-      </div>
+        <h3>📞 Request Contact</h3>
+        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Yêu cầu user chia sẻ số điện thoại</p>
+        <div class="button-group">
+            <button @click="requestContact">Yêu cầu số điện thoại</button>
+        </div>
+        <div v-if="contactResult" class="storage-result">
+            {{ contactResult }}
+        </div>
     </div>
 
-    <!-- Popup Demo -->
+    <!-- 5.3 Read Clipboard Demo -->
     <div class="native-controls">
-      <h3>💬 Popup Demo</h3>
-      <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Hộp thoại xác nhận với các nút tùy chọn (OK/Cancel/Destructive)</p>
-      <div class="button-group">
-        <button @click="showPopup">Hiện Popup Chuẩn</button>
-      </div>
+        <h3>📋 Read Clipboard</h3>
+        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Đọc nội dung text từ clipboard</p>
+        <div class="button-group">
+            <button @click="readTextFromClipboard" :disabled="isReadingClipboard">
+                {{ isReadingClipboard ? '⏳ Đang đọc...' : '📋 Đọc Clipboard' }}
+            </button>
+        </div>
+        <div v-if="clipboardText" class="storage-result">
+            {{ clipboardText }}
+        </div>
     </div>
 
-    <!-- Closing Behavior Demo -->
-    <div class="native-controls">
-      <h3>🚪 Closing Behavior</h3>
-      <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Bật/tắt xác nhận trước khi đóng Mini App (để tránh mất dữ liệu)</p>
-      <div class="button-group">
-        <button @click="enableCloseConfirmation">🔒 Bật Xác nhận đóng</button>
-        <button @click="disableCloseConfirmation">🔓 Tắt Xác nhận đóng</button>
-      </div>
-    </div>
+    <!-- ========================================== -->
+    <!-- 6. STORAGE - Lưu trữ -->
+    <!-- ========================================== -->
 
-    <!-- Viewport Demo -->
-    <div class="native-controls">
-      <h3>📐 Viewport</h3>
-      <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Mở rộng viewport để Mini App chiếm toàn bộ màn hình có thể</p>
-      <div class="viewport-info">
-        <p>Height: <strong>{{ viewportHeight }}px</strong></p>
-        <p>Expanded: <strong>{{ viewportIsExpanded ? '✅ Yes' : '❌ No' }}</strong></p>
-      </div>
-      <div class="button-group">
-        <button @click="expandMiniApp">🔲 Expand Full Screen</button>
-      </div>
-    </div>
-
-    <!-- Cloud Storage Demo -->
+    <!-- 6.1 Cloud Storage Demo -->
     <div class="native-controls">
       <h3>☁️ Cloud Storage</h3>
       <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Lưu dữ liệu key-value lên cloud Telegram, tự động đồng bộ giữa các thiết bị</p>
@@ -1470,7 +1412,85 @@ const changeHeaderColor = (color: string) => {
       </div>
     </div>
 
-    <!-- Biometric Demo -->
+    <!-- ========================================== -->
+    <!-- 7. SENSORS - Cảm biến -->
+    <!-- ========================================== -->
+
+    <!-- 7.1 Accelerometer Demo -->
+    <div class="native-controls">
+        <h3>📱 Accelerometer</h3>
+        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Đọc dữ liệu cảm biến gia tốc</p>
+        <div class="button-group">
+            <button @click="startAccelerometer" :disabled="isAccelerometerActive">▶️ Start</button>
+            <button @click="stopAccelerometer" :disabled="!isAccelerometerActive">⏹️ Stop</button>
+        </div>
+        <div class="storage-result" style="font-family: monospace;">
+            X: {{ accelerometerData.x.toFixed(3) }}<br/>
+            Y: {{ accelerometerData.y.toFixed(3) }}<br/>
+            Z: {{ accelerometerData.z.toFixed(3) }}
+        </div>
+    </div>
+
+    <!-- 7.2 Gyroscope Demo -->
+    <div class="native-controls">
+        <h3>🌀 Gyroscope</h3>
+        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Đọc dữ liệu cảm biến con quay hồi chuyển</p>
+        <div class="button-group">
+            <button @click="startGyroscope" :disabled="isGyroscopeActive">▶️ Start</button>
+            <button @click="stopGyroscope" :disabled="!isGyroscopeActive">⏹️ Stop</button>
+        </div>
+        <div class="storage-result" style="font-family: monospace;">
+            X (Beta): {{ gyroscopeData.x.toFixed(3) }}<br/>
+            Y (Gamma): {{ gyroscopeData.y.toFixed(3) }}<br/>
+            Z (Alpha): {{ gyroscopeData.z.toFixed(3) }}
+        </div>
+    </div>
+
+    <!-- 7.3 Device Orientation Demo -->
+    <div class="native-controls">
+        <h3>🧭 Device Orientation</h3>
+        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Đọc hướng thiết bị (la bàn số)</p>
+        <div class="button-group">
+            <button @click="startDeviceOrientation" :disabled="isDeviceOrientationActive">▶️ Start</button>
+            <button @click="stopDeviceOrientation" :disabled="!isDeviceOrientationActive">⏹️ Stop</button>
+        </div>
+        <div class="storage-result" style="font-family: monospace;">
+            Alpha (Hướng): {{ deviceOrientationData.alpha.toFixed(1) }}°<br/>
+            Beta (Nghiêng trước/sau): {{ deviceOrientationData.beta.toFixed(1) }}°<br/>
+            Gamma (Nghiêng trái/phải): {{ deviceOrientationData.gamma.toFixed(1) }}°<br/>
+            Absolute: {{ deviceOrientationData.absolute ? 'Có' : 'Không' }}
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 8. LOCATION - Vị trí -->
+    <!-- ========================================== -->
+
+    <!-- 8.1 Location Manager Demo -->
+    <div class="native-controls">
+        <h3>📍 Location Manager</h3>
+        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Lấy vị trí GPS hiện tại</p>
+        <div class="button-group">
+            <button @click="openLocationSettings">⚙️ Cài đặt</button>
+            <button @click="getCurrentLocation" :disabled="isLoadingLocation">
+                {{ isLoadingLocation ? '⏳ Đang lấy...' : '📍 Lấy vị trí' }}
+            </button>
+        </div>
+        <div class="storage-result" style="font-family: monospace;">
+            <template v-if="locationError">{{ locationError }}</template>
+            <template v-else>
+                Latitude: {{ locationData.latitude.toFixed(6) }}<br/>
+                Longitude: {{ locationData.longitude.toFixed(6) }}<br/>
+                Độ chính xác: {{ locationData.accuracy.toFixed(0) }}m
+            </template>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 9. BIOMETRIC - Sinh trắc học -->
+    <!-- ========================================== -->
+
+    <!-- 9.1 Biometric Demo -->
     <div class="native-controls">
       <h3>🔐 Biometric Authentication</h3>
       <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Xác thực bằng vân tay hoặc FaceID để bảo vệ dữ liệu nhạy cảm</p>
@@ -1483,6 +1503,50 @@ const changeHeaderColor = (color: string) => {
         {{ biometricResult }}
       </div>
     </div>
+
+    <!-- ========================================== -->
+    <!-- 10. OTHERS - Khác -->
+    <!-- ========================================== -->
+
+    <!-- 10.1 Emoji Status Demo -->
+    <div class="native-controls">
+        <h3>😀 Emoji Status</h3>
+        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Đặt emoji status cho user (yêu cầu Telegram Premium)</p>
+        <div class="storage-inputs">
+            <input v-model="emojiId" placeholder="Custom Emoji ID" class="storage-input" />
+        </div>
+        <div class="button-group">
+            <button @click="setEmojiStatus">Đặt Emoji Status</button>
+        </div>
+        <div v-if="emojiStatusResult" class="storage-result">
+            {{ emojiStatusResult }}
+        </div>
+    </div>
+
+    <!-- 10.2 Home Screen Demo -->
+    <div class="native-controls">
+        <h3>🏠 Add to Home Screen</h3>
+        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Thêm Mini App vào màn hình chính</p>
+        <div class="button-group">
+            <button @click="addToHomeScreen">➕ Thêm vào Home Screen</button>
+        </div>
+        <div v-if="homeScreenResult" class="storage-result">
+            {{ homeScreenResult }}
+        </div>
+    </div>
+
+    <!-- 10.3 Start Param Demo -->
+    <div class="native-controls">
+        <h3>🚀 Start Param</h3>
+        <p style="font-size: 12px; color: var(--tg-theme-hint-color);">Tham số khởi động từ deep link (t.me/bot?startapp=xxx)</p>
+        <div class="storage-result" style="font-family: monospace;">
+            {{ startParam ? `Start Param: ${startParam}` : '(Không có start param)' }}
+        </div>
+        <p style="font-size: 11px; color: var(--tg-theme-hint-color); margin-top: 8px;">
+            Test bằng cách thêm <code>?tgWebAppStartParam=test123</code> vào URL
+        </p>
+    </div>
+
   </AppPage>
 </template>
 
