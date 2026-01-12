@@ -11,7 +11,7 @@ import { TonConnectUIPlugin } from './tonconnect';
 import { publicUrl } from './helperts/publicUrl';
 
 // Mock the environment in case, we are outside Telegram.
-import './mockEnv';
+// import './mockEnv';
 
 const launchParams = retrieveLaunchParams();
 const { tgWebAppPlatform: platform } = launchParams;
