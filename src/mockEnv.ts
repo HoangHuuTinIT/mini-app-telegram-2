@@ -1,5 +1,5 @@
-import { emitEvent, mockTelegramEnv } from '@tma.js/sdk-vue';
-import { isTMA } from './untils/isTMA';
+import { emitEvent,isTMA, mockTelegramEnv } from '@tma.js/sdk-vue';
+// import {  } from './untils/isTMA';
 
 // It is important, to mock the environment only for development purposes. When building the
 // application, import.meta.env.DEV will become false, and the code inside will be tree-shaken,
